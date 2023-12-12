@@ -49,11 +49,16 @@ exports.handler = async (event, context) => {
 };
 
 function updateAssetUrls(htmlContent, originalAddress) {
-  // Replace URLs for assets with the original domain
-  const updatedContent = htmlContent.replace(/(src|href)="\/styles\/(.*?)"/g, (_, attribute, path) => {
-    const resolvedUrl = originalAddress + '/styles/' + path;
-    return `${attribute}="${resolvedUrl}"`;
-  });
 
-  return updatedContent;
+    
+    const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
+    console.log(baseUrl);
+
+    // Replace URLs for assets with the original domain
+    const updatedContent = htmlContent.replace(/(src|href)="\/styles\/(.*?)"/g, (_, attribute, path) => {
+        const resolvedUrl = baseUrl + '/styles/' + path;
+        return `${attribute}="${resolvedUrl}"`;
+    });
+
+    return updatedContent;
 }
