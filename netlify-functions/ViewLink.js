@@ -1,21 +1,18 @@
-// netlify-functions/ViewLink.js
-
 const { Deta } = require('deta');
 const axios = require('axios');
-const { parse, resolve } = require('url');
 
 const deta = Deta(process.env.DETA_PROJECT_KEY);
 const linksTable = deta.Base('Obsidian_Links');
 
 exports.handler = async (event, context) => {
   try {
-    const { token, url } = event.queryStringParameters;
+    const { token } = event.queryStringParameters;
 
     // Check if the token exists
     if (!token) {
       return {
         statusCode: 403,
-        body: JSON.stringify({ error: 'Invalid link' }),
+        body: "The link given was invalid, please ask for another",
       };
     }
 
@@ -26,44 +23,49 @@ exports.handler = async (event, context) => {
     if (!linkInfo || Date.now() > linkInfo.expirationTime) {
       return {
         statusCode: 403,
-        body: JSON.stringify({ error: 'Invalid or expired link' }),
+        body: "The link given is invalid or may have expired, please ask for another",
       };
     }
 
     // Fetch content from the original Vercel app address
     const originalAddress = linkInfo.address;
+    const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
     const response = await axios.get(originalAddress);
 
     // Modify the fetched HTML content to update URLs for assets
     const modifiedContent = updateAssetUrls(response.data, originalAddress);
 
+    // Return the modified response
     return {
       statusCode: response.status,
       headers: response.headers,
       body: modifiedContent,
     };
+
   } catch (error) {
     console.error('Error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Internal Server Error' }),
+      body: "Internal Server Error. This is a problem :(",
     };
   }
 };
 
 function updateAssetUrls(htmlContent, originalAddress) {
-
-    return htmlContent;
-    // Extract the origin from the originalAddress
+  try {
     const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
-  
-    // Use a regular expression to update URLs for assets
-    const updatedContent = htmlContent.replace(/(src|href)="(?!https|\/)(.*?)"/g, (_, attribute, path) => {
-      // Check if path is undefined before attempting to resolve it
-      const resolvedUrl = path ? baseUrl + '/' + path : '';
+
+    // Replace URLs for assets with the original domain using synchronous replace
+    const updatedContent = htmlContent.replace(/(src|href)="(\/styles\/.*?)"/g, (match, attribute, path) => {
+      const resolvedUrl = baseUrl + path;
       return `${attribute}="${resolvedUrl}"`;
     });
-  
+
+    console.log(updatedContent);
+
     return updatedContent;
+  } catch (error) {
+    console.error('Error in updateAssetUrls:', error);
+    return htmlContent; // Return the original content in case of an error
   }
-  
+}
