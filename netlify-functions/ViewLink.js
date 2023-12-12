@@ -32,7 +32,7 @@ exports.handler = async (event, context) => {
     const response = await axios.get(originalAddress);
 
     // Modify the fetched HTML content to update URLs for assets
-    const modifiedContent = updateAssetUrls(response.data, originalAddress);
+    const modifiedContent = await updateAssetUrls(response.data, originalAddress);
 
     return {
       statusCode: response.status,
@@ -48,8 +48,7 @@ exports.handler = async (event, context) => {
   }
 };
 
-function updateAssetUrls(htmlContent, originalAddress) {
-
+async function updateAssetUrls(htmlContent, originalAddress) {
     
     const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
     console.log(baseUrl);
@@ -59,6 +58,8 @@ function updateAssetUrls(htmlContent, originalAddress) {
         const resolvedUrl = baseUrl + '/styles/' + path;
         return `${attribute}="${resolvedUrl}"`;
     });
+
+    console.log(updatedContent);
 
     return updatedContent;
 }
