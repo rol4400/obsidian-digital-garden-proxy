@@ -33,7 +33,7 @@ exports.handler = async (event, context) => {
     const response = await axios.get(originalAddress);
 
     // Modify the fetched HTML content to update URLs for assets
-    response.data.replace(/(src|href)="(\/styles\/.*?)"/g, (match, attribute, path) => {
+    (response.data).replace(/(src|href)="(\/styles\/.*?)"/g, (match, attribute, path) => {
         const resolvedUrl = baseUrl + path;
         return `${attribute}="${resolvedUrl}"`;
 
