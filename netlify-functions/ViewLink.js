@@ -33,16 +33,19 @@ exports.handler = async (event, context) => {
     const response = await axios.get(originalAddress);
 
     // Modify the fetched HTML content to update URLs for assets
-    htmlContent.replace(/(src|href)="(\/styles\/.*?)"/g, (match, attribute, path) => {
+    response.data.replace(/(src|href)="(\/styles\/.*?)"/g, (match, attribute, path) => {
         const resolvedUrl = baseUrl + path;
         return `${attribute}="${resolvedUrl}"`;
-      }).then((modifiedContent) => {
+
+    // Return the modified response
+    }).then((modifiedContent) => {
         return {
             statusCode: response.status,
             headers: response.headers,
             body: modifiedContent,
-          };
-      });
+        };
+    });
+
    
   } catch (error) {
     console.error('Error:', error);
