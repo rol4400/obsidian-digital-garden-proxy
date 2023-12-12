@@ -30,18 +30,6 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // If the request is for a static asset, fetch and return it directly
-    if (url.startsWith('/styles/') || url.startsWith('/images/') || url.startsWith('/scripts/')) {
-      const assetResponse = await axios.get(linkInfo.address, { responseType: 'arraybuffer' });
-
-      return {
-        statusCode: assetResponse.status,
-        headers: assetResponse.headers,
-        body: Buffer.from(assetResponse.data, 'binary').toString('base64'),
-        isBase64Encoded: true,
-      };
-    }
-
     // Fetch content from the original Vercel app address
     const originalAddress = linkInfo.address;
     const response = await axios.get(originalAddress);
@@ -69,7 +57,7 @@ function updateAssetUrls(htmlContent, originalAddress) {
 
   // Use a regular expression to update URLs for assets
   const updatedContent = htmlContent.replace(/(src|href)="(?!http|\/)(.*?)"/g, (_, attribute, path) => {
-    const resolvedUrl = resolve(baseUrl.href, path);
+    const resolvedUrl = resolve(baseUrl.origin, path); // Use baseUrl.origin to get the original domain
     return `${attribute}="${resolvedUrl}"`;
   });
 
