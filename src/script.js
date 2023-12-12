@@ -6,10 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(response => response.json()) // Assuming ViewLink returns JSON with head and body
       .then(data => {
         // Set the body content
-        document.body.innerHTML = data.body;
+        document.body.innerHTML = JSON.parse(data.body);
   
         // Set the head content
-        document.head.innerHTML = data.head;
+        document.head.innerHTML = JSON.parse(data.head);
   
         // Load stylesheets dynamically
         loadStylesheets(data.head);
@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const newContent = await response.json(); // Assuming ViewLink returns JSON with head and body
   
             // Update the DOM with the new content
-            document.head.innerHTML = newContent.head;
-            document.body.innerHTML = newContent.body;
+            document.head.innerHTML = JSON.parse(newContent.head);
+            document.body.innerHTML = JSON.parse(newContent.body);
   
             // Load stylesheets dynamically
             loadStylesheets(newContent.head);
