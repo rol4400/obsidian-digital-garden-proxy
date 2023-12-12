@@ -33,20 +33,15 @@ exports.handler = async (event, context) => {
     const response = await axios.get(originalAddress);
 
     // Modify the fetched HTML content to update URLs for assets
-    (response.data).replace(/(src|href)="(\/styles\/.*?)"/g, (match, attribute, path) => {
-        const resolvedUrl = baseUrl + path;
-        return `${attribute}="${resolvedUrl}"`;
+    const modifiedContent = updateAssetUrls(response.data, originalAddress);
 
     // Return the modified response
-    }).then((modifiedContent) => {
-        return {
-            statusCode: response.status,
-            headers: response.headers,
-            body: modifiedContent,
-        };
-    });
+    return {
+      statusCode: response.status,
+      headers: response.headers,
+      body: modifiedContent,
+    };
 
-   
   } catch (error) {
     console.error('Error:', error);
     return {
@@ -57,27 +52,20 @@ exports.handler = async (event, context) => {
 };
 
 function updateAssetUrls(htmlContent, originalAddress) {
-    try {
-      const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
-  
-      // Split the HTML content by attribute and handle replacements synchronously
-      const parts = htmlContent.split(/(src|href)="(\/styles\/.*?)"/);
-      let updatedContent = '';
-  
-      for (let i = 0; i < parts.length; i += 3) {
-        updatedContent += parts[i];
-        if (i + 1 < parts.length) {
-          const path = parts[i + 1];
-          const resolvedUrl = baseUrl + path;
-          updatedContent += `src="${resolvedUrl}"`;
-        }
-      }
-  
-      console.log(updatedContent);
-  
-      return updatedContent;
-    } catch (error) {
-      console.error('Error in updateAssetUrls:', error);
-      return htmlContent; // Return the original content in case of an error
-    }
+  try {
+    const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
+
+    // Replace URLs for assets with the original domain using synchronous replace
+    const updatedContent = htmlContent.replace(/(src|href)="(\/styles\/.*?)"/g, (match, attribute, path) => {
+      const resolvedUrl = baseUrl + path;
+      return `${attribute}="${resolvedUrl}"`;
+    });
+
+    console.log(updatedContent);
+
+    return updatedContent;
+  } catch (error) {
+    console.error('Error in updateAssetUrls:', error);
+    return htmlContent; // Return the original content in case of an error
   }
+}
