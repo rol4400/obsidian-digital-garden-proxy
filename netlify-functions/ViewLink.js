@@ -38,7 +38,8 @@ exports.handler = async (event, context) => {
     return {
       statusCode: response.status,
       headers: response.headers,
-      body: JSON.stringify({ head, body }),
+      body: body,
+      head: head,
     };
 
   } catch (error) {
