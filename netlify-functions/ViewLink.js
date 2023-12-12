@@ -1,15 +1,12 @@
-// netlify-functions/ViewLink.js
-
 const { Deta } = require('deta');
 const axios = require('axios');
-const { parse, resolve } = require('url');
 
 const deta = Deta(process.env.DETA_PROJECT_KEY);
 const linksTable = deta.Base('Obsidian_Links');
 
 exports.handler = async (event, context) => {
   try {
-    const { token, url } = event.queryStringParameters;
+    const { token } = event.queryStringParameters;
 
     // Check if the token exists
     if (!token) {
@@ -35,7 +32,7 @@ exports.handler = async (event, context) => {
     const response = await axios.get(originalAddress);
 
     // Modify the fetched HTML content to update URLs for assets
-    const modifiedContent = response.data; //updateAssetUrls(response.data, originalAddress);
+    const modifiedContent = updateAssetUrls(response.data, originalAddress);
 
     return {
       statusCode: response.status,
@@ -52,16 +49,11 @@ exports.handler = async (event, context) => {
 };
 
 function updateAssetUrls(htmlContent, originalAddress) {
-    // Extract the origin from the originalAddress
-    const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
-  
-    // Use a regular expression to update URLs for assets
-    const updatedContent = htmlContent.replace(/(src|href)="(?!https|\/)(.*?)"/g, (_, attribute, path) => {
-      // Check if path is undefined before attempting to resolve it
-      const resolvedUrl = path ? baseUrl + '/' + path : '';
-      return `${attribute}="${resolvedUrl}"`;
-    });
-  
-    return updatedContent;
-  }
-  
+  // Replace URLs for assets with the original domain
+  const updatedContent = htmlContent.replace(/(src|href)="\/styles\/(.*?)"/g, (_, attribute, path) => {
+    const resolvedUrl = originalAddress + '/styles/' + path;
+    return `${attribute}="${resolvedUrl}"`;
+  });
+
+  return updatedContent;
+}
