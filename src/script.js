@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch(`/.netlify/functions/ViewLink?token=${token}`)
       .then(response => response.text())
       .then(data => {
-        document.body.innerHTML = data;
+        document.body.innerHTML = data.body;
   
         // Attach click event listener to handle links within the fetched page
         document.addEventListener('click', async (event) => {

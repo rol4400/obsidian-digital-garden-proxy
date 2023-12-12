@@ -1,5 +1,6 @@
 const { Deta } = require('deta');
 const axios = require('axios');
+const cheerio = require('cheerio');
 
 const deta = Deta(process.env.DETA_PROJECT_KEY);
 const linksTable = deta.Base('Obsidian_Links');
@@ -32,14 +33,22 @@ exports.handler = async (event, context) => {
     const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
     const response = await axios.get(originalAddress);
 
+    // Parse HTML content using cheerio
+    const $ = cheerio.load(response.data);
+
+    // Extract head and body sections
+    const head = $('head').html();
+    const body = $('body').html();
+
     // Modify the fetched HTML content to update URLs for assets
-    const modifiedContent = updateAssetUrls(response.data.body, originalAddress);
+    // const modifiedContent = updateAssetUrls(body, originalAddress);
 
     // Return the modified response
     return {
       statusCode: response.status,
       headers: response.headers,
-      body: modifiedContent,
+      body: body,
+      head: head
     };
 
   } catch (error) {
