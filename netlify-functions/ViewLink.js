@@ -12,7 +12,7 @@ exports.handler = async (event, context) => {
     if (!token) {
       return {
         statusCode: 403,
-        body: JSON.stringify({ error: 'Invalid link' }),
+        body: "The link given was invalid, please ask for another",
       };
     }
 
@@ -23,27 +23,32 @@ exports.handler = async (event, context) => {
     if (!linkInfo || Date.now() > linkInfo.expirationTime) {
       return {
         statusCode: 403,
-        body: JSON.stringify({ error: 'Invalid or expired link' }),
+        body: "The link given is invalid or may have expired, please ask for another",
       };
     }
 
     // Fetch content from the original Vercel app address
     const originalAddress = linkInfo.address;
+    const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
     const response = await axios.get(originalAddress);
 
     // Modify the fetched HTML content to update URLs for assets
-    const modifiedContent = updateAssetUrls(response.data, originalAddress);
-
-    return {
-      statusCode: response.status,
-      headers: response.headers,
-      body: modifiedContent,
-    };
+    htmlContent.replace(/(src|href)="(\/styles\/.*?)"/g, (match, attribute, path) => {
+        const resolvedUrl = baseUrl + path;
+        return `${attribute}="${resolvedUrl}"`;
+      }).then((modifiedContent) => {
+        return {
+            statusCode: response.status,
+            headers: response.headers,
+            body: modifiedContent,
+          };
+      });
+   
   } catch (error) {
     console.error('Error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Internal Server Error' }),
+      body: "Internal Server Error. This is a problem :(",
     };
   }
 };
