@@ -1,18 +1,13 @@
+// src/script.js
+
 document.addEventListener('DOMContentLoaded', () => {
-    const token = getTokenFromUrl();
+    const token = getTokenFromUrl(); // Extract token from the URL
   
     // Fetch content from the ViewLink function on page load
     fetch(`/.netlify/functions/ViewLink?token=${token}`)
-      .then(response => response.json()) // Assuming ViewLink returns JSON with head and body
+      .then(response => response.text())
       .then(data => {
-        // Set the body content
-        document.body.innerHTML = data.body;
-  
-        // Set the head content
-        // document.head.innerHTML = data.head;
-  
-        // Load stylesheets dynamically
-        loadStylesheets(data.head);
+        document.body.innerHTML = data;
   
         // Attach click event listener to handle links within the fetched page
         document.addEventListener('click', async (event) => {
@@ -23,36 +18,18 @@ document.addEventListener('DOMContentLoaded', () => {
   
             // Fetch new content using the same token
             const response = await fetch(`/.netlify/functions/ViewLink?token=${token}&url=${path}`);
-            const newContent = await response.json(); // Assuming ViewLink returns JSON with head and body
+            const newContent = await response.text();
   
             // Update the DOM with the new content
-            document.head.innerHTML = newContent.head;
-            document.body.innerHTML = newContent.body;
-  
-            // Load stylesheets dynamically
-            loadStylesheets(newContent.head);
+            document.body.innerHTML = newContent;
           }
         });
       })
       .catch(error => console.error('Error fetching content:', error));
   
-    function loadStylesheets(headContent) {
-      // Extract stylesheet URLs from the head content
-      const matches = headContent.match(/<link rel="stylesheet" href="(.*?)">/g);
-      if (matches) {
-        matches.forEach(match => {
-          const href = match.match(/href="(.*?)"/)[1];
-          const link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = href;
-          document.head.appendChild(link);
-        });
-      }
-    }
-  
     function getTokenFromUrl() {
       const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get('token') || 'default-token';
+      return urlParams.get('token') || 'default-token'; // Use a default token if not found
     }
   });
   
