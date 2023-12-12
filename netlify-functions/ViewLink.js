@@ -52,14 +52,16 @@ exports.handler = async (event, context) => {
 };
 
 function updateAssetUrls(htmlContent, originalAddress) {
-  // Parse the base URL to resolve relative paths correctly
-  const baseUrl = parse(originalAddress);
-
-  // Use a regular expression to update URLs for assets
-  const updatedContent = htmlContent.replace(/(src|href)="(?!http|\/)(.*?)"/g, (_, attribute, path) => {
-    const resolvedUrl = resolve(baseUrl.origin, path); // Use baseUrl.origin to get the original domain
-    return `${attribute}="${resolvedUrl}"`;
-  });
-
-  return updatedContent;
-}
+    // Extract the origin from the originalAddress
+    const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
+  
+    // Use a regular expression to update URLs for assets
+    const updatedContent = htmlContent.replace(/(src|href)="(?!http|\/)(.*?)"/g, (_, attribute, path) => {
+      // Check if path is undefined before attempting to resolve it
+      const resolvedUrl = path ? baseUrl + '/' + path : '';
+      return `${attribute}="${resolvedUrl}"`;
+    });
+  
+    return updatedContent;
+  }
+  
