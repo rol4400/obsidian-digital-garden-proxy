@@ -32,7 +32,10 @@ exports.handler = async (event, context) => {
     const response = await axios.get(originalAddress);
 
     // Modify the fetched HTML content to update URLs for assets
-    const { head, body } = updateAssetUrls(response.data, originalAddress);
+    // const { head, body } = updateAssetUrls(response.data, originalAddress);
+
+    const head = response.data.head;
+    const body = response.data.body;
 
     // Return the modified response with head and body separately
     return {
