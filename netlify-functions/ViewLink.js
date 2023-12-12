@@ -30,6 +30,18 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // If the request is for a static asset, fetch and return it directly
+    if (url.startsWith('/styles/') || url.startsWith('/images/') || url.startsWith('/scripts/')) {
+      const assetResponse = await axios.get(linkInfo.address, { responseType: 'arraybuffer' });
+
+      return {
+        statusCode: assetResponse.status,
+        headers: assetResponse.headers,
+        body: Buffer.from(assetResponse.data, 'binary').toString('base64'),
+        isBase64Encoded: true,
+      };
+    }
+
     // Fetch content from the original Vercel app address
     const originalAddress = linkInfo.address;
     const response = await axios.get(originalAddress);
