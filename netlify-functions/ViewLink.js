@@ -32,7 +32,7 @@ exports.handler = async (event, context) => {
     const response = await axios.get(originalAddress);
 
     // Modify the fetched HTML content to update URLs for assets
-    const modifiedContent = await updateAssetUrls(response.data, originalAddress);
+    const modifiedContent = updateAssetUrls(response.data, originalAddress);
 
     return {
       statusCode: response.status,
@@ -48,18 +48,28 @@ exports.handler = async (event, context) => {
   }
 };
 
-async function updateAssetUrls(htmlContent, originalAddress) {
-    
-    const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
-    console.log(baseUrl);
-
-    // Replace URLs for assets with the original domain
-    const updatedContent = htmlContent.replace(/(src|href)="\/styles\/(.*?)"/g, (_, attribute, path) => {
-        const resolvedUrl = baseUrl + '/styles/' + path;
-        return `${attribute}="${resolvedUrl}"`;
-    });
-
-    console.log(updatedContent);
-
-    return updatedContent;
-}
+function updateAssetUrls(htmlContent, originalAddress) {
+    try {
+      const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
+  
+      // Split the HTML content by attribute and handle replacements synchronously
+      const parts = htmlContent.split(/(src|href)="(\/styles\/.*?)"/);
+      let updatedContent = '';
+  
+      for (let i = 0; i < parts.length; i += 3) {
+        updatedContent += parts[i];
+        if (i + 1 < parts.length) {
+          const path = parts[i + 1];
+          const resolvedUrl = baseUrl + path;
+          updatedContent += `src="${resolvedUrl}"`;
+        }
+      }
+  
+      console.log(updatedContent);
+  
+      return updatedContent;
+    } catch (error) {
+      console.error('Error in updateAssetUrls:', error);
+      return htmlContent; // Return the original content in case of an error
+    }
+  }
