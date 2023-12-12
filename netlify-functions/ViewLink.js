@@ -32,13 +32,13 @@ exports.handler = async (event, context) => {
     const response = await axios.get(originalAddress);
 
     // Modify the fetched HTML content to update URLs for assets
-    const modifiedContent = updateAssetUrls(response.data, originalAddress);
+    const { head, body } = updateAssetUrls(response.data, originalAddress);
 
-    // Return the modified response
+    // Return the modified response with head and body separately
     return {
       statusCode: response.status,
       headers: response.headers,
-      body: modifiedContent,
+      body: JSON.stringify({ head, body }),
     };
 
   } catch (error) {
@@ -51,30 +51,32 @@ exports.handler = async (event, context) => {
 };
 
 function updateAssetUrls(htmlContent, originalAddress) {
-    try {
-      const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
-  
-      // Parse the HTML content using DOMParser
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(htmlContent, 'text/html');
-  
-      // Update URLs for assets with the original domain
-      const elements = doc.querySelectorAll('[src^="/styles/"], [href^="/styles/"]');
-      elements.forEach((element) => {
-        const path = element.getAttribute('src') || element.getAttribute('href');
-        const resolvedUrl = baseUrl + path;
-        element.setAttribute('src', resolvedUrl);
-        element.setAttribute('href', resolvedUrl);
-      });
-  
-      // Serialize the modified document back to HTML
-      const updatedContent = new XMLSerializer().serializeToString(doc);
-  
-      console.log(updatedContent);
-  
-      return updatedContent;
-    } catch (error) {
-      console.error('Error in updateAssetUrls:', error);
-      return htmlContent; // Return the original content in case of an error
-    }
+  try {
+    const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
+
+    // Parse the HTML content using DOMParser
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, 'text/html');
+
+    // Update URLs for assets with the original domain
+    const elements = doc.querySelectorAll('[src^="/styles/"], [href^="/styles/"]');
+    elements.forEach((element) => {
+      const path = element.getAttribute('src') || element.getAttribute('href');
+      const resolvedUrl = baseUrl + path;
+      element.setAttribute('src', resolvedUrl);
+      element.setAttribute('href', resolvedUrl);
+    });
+
+    // Serialize the modified document back to HTML
+    const updatedContent = new XMLSerializer().serializeToString(doc);
+
+    // Extract head and body sections
+    const head = doc.head.innerHTML;
+    const body = doc.body.innerHTML;
+
+    return { head, body };
+  } catch (error) {
+    console.error('Error in updateAssetUrls:', error);
+    return { head: '', body: htmlContent }; // Return the original content for both head and body in case of an error
   }
+}
