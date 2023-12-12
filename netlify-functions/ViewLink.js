@@ -29,7 +29,6 @@ exports.handler = async (event, context) => {
 
     // Fetch content from the original Vercel app address
     const originalAddress = linkInfo.address;
-    const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
     const response = await axios.get(originalAddress);
 
     // Modify the fetched HTML content to update URLs for assets
