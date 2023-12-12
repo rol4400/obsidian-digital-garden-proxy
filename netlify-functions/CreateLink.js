@@ -1,5 +1,4 @@
 // netlify-functions/CreateLink.js
-
 const { Deta } = require('deta');
 
 const deta = Deta(process.env.DETA_PROJECT_KEY);
@@ -17,16 +16,12 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Generate temporary token
-    const token = generateTemporaryToken();
-    const expirationTime = Date.now() + parseInt(duration) * 1000;
-
     // Save link information to Deta.Base
-    await linksTable.put({ token, address, expirationTime });
+    const link = await linksTable.put({ address, expirationTime: calculateExpirationTime(duration) });
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ token, expirationTime }),
+      body: JSON.stringify({ link: "https://ryan-notes.netlify.app/?token=" + link.key, token: link.key, expirationTime: link.expires }),
     };
   } catch (error) {
     console.error('Error:', error);
@@ -37,7 +32,6 @@ exports.handler = async (event, context) => {
   }
 };
 
-function generateTemporaryToken() {
-  // Generate a unique temporary token (replace with your own logic)
-  return Math.random().toString(36).substr(2);
+function calculateExpirationTime(duration) {
+  return Date.now() + parseInt(duration) * 1000;
 }

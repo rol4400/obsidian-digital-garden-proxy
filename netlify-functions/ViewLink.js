@@ -31,7 +31,7 @@ exports.handler = async (event, context) => {
 
     // Fetch content from the original Vercel app address
     const originalAddress = linkInfo.address;
-    const response = await axios.get(originalAddress + url);
+    const response = await axios.get(originalAddress);
 
     return {
       statusCode: response.status,
