@@ -51,20 +51,30 @@ exports.handler = async (event, context) => {
 };
 
 function updateAssetUrls(htmlContent, originalAddress) {
-  try {
-    const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
-
-    // Replace URLs for assets with the original domain using synchronous replace
-    const updatedContent = htmlContent.replace(/(src|href)="(\/styles\/.*?)"/g, (match, attribute, path) => {
-      const resolvedUrl = baseUrl + path;
-      return `${attribute}="${resolvedUrl}"`;
-    });
-
-    console.log(updatedContent);
-
-    return updatedContent;
-  } catch (error) {
-    console.error('Error in updateAssetUrls:', error);
-    return htmlContent; // Return the original content in case of an error
+    try {
+      const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
+  
+      // Parse the HTML content using DOMParser
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlContent, 'text/html');
+  
+      // Update URLs for assets with the original domain
+      const elements = doc.querySelectorAll('[src^="/styles/"], [href^="/styles/"]');
+      elements.forEach((element) => {
+        const path = element.getAttribute('src') || element.getAttribute('href');
+        const resolvedUrl = baseUrl + path;
+        element.setAttribute('src', resolvedUrl);
+        element.setAttribute('href', resolvedUrl);
+      });
+  
+      // Serialize the modified document back to HTML
+      const updatedContent = new XMLSerializer().serializeToString(doc);
+  
+      console.log(updatedContent);
+  
+      return updatedContent;
+    } catch (error) {
+      console.error('Error in updateAssetUrls:', error);
+      return htmlContent; // Return the original content in case of an error
+    }
   }
-}
