@@ -1,9 +1,10 @@
 // netlify-functions/ViewLink.js
 
-const { Deta } = require('deta');
+const { Base } = require('deta');
 const axios = require('axios');
+const { parse, resolve } = require('url');
 
-const deta = Deta(process.env.DETA_PROJECT_KEY);
+const deta = Base(process.env.DETA_PROJECT_KEY);
 const linksTable = deta.Base('Obsidian_Links');
 
 exports.handler = async (event, context) => {
@@ -31,12 +32,15 @@ exports.handler = async (event, context) => {
 
     // Fetch content from the original Vercel app address
     const originalAddress = linkInfo.address;
-    const response = await axios.get(originalAddress);
+    const response = await axios.get(originalAddress + url);
+
+    // Modify the fetched HTML content to update URLs for assets
+    const modifiedContent = updateAssetUrls(response.data, originalAddress);
 
     return {
       statusCode: response.status,
       headers: response.headers,
-      body: response.data,
+      body: modifiedContent,
     };
   } catch (error) {
     console.error('Error:', error);
@@ -46,3 +50,16 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
+function updateAssetUrls(htmlContent, originalAddress) {
+  // Parse the base URL to resolve relative paths correctly
+  const baseUrl = parse(originalAddress);
+
+  // Use a regular expression to update URLs for assets
+  const updatedContent = htmlContent.replace(/(src|href)="(?!http|\/)(.*?)"/g, (_, attribute, path) => {
+    const resolvedUrl = resolve(baseUrl.href, path);
+    return `${attribute}="${resolvedUrl}"`;
+  });
+
+  return updatedContent;
+}
