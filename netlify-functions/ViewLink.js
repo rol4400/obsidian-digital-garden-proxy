@@ -1,10 +1,10 @@
 // netlify-functions/ViewLink.js
 
-const { Base } = require('deta');
+const { Deta } = require('deta');
 const axios = require('axios');
 const { parse, resolve } = require('url');
 
-const deta = Base(process.env.DETA_PROJECT_KEY);
+const deta = Deta(process.env.DETA_PROJECT_KEY);
 const linksTable = deta.Base('Obsidian_Links');
 
 exports.handler = async (event, context) => {
