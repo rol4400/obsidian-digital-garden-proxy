@@ -55,19 +55,13 @@ function updateAssetUrls(htmlContent, originalAddress) {
     // Extract the origin from the originalAddress
     const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
   
-    // Split the HTML content by attribute and handle replacements
-    const updatedContent = htmlContent.split(/(src|href)="(?!http|\/)(.*?)"/g).map((part, index) => {
-      if (index % 3 === 0) {
-        return part; // unchanged parts
-      } else if (index % 3 === 1) {
-        // attribute (src or href)
-        return part;
-      } else {
-        // path to be replaced
-        const resolvedUrl = part ? baseUrl + '/' + part : '';
-        return resolvedUrl;
-      }
-    }).join('');
+    // Use a regular expression to update URLs for assets
+    const updatedContent = htmlContent.replace(/(src|href)="(?!https|\/)(.*?)"/g, (_, attribute, path) => {
+      // Check if path is undefined before attempting to resolve it
+      const resolvedUrl = path ? baseUrl + '/' + path : '';
+      return `${attribute}="${resolvedUrl}"`;
+    });
   
     return updatedContent;
   }
+  
