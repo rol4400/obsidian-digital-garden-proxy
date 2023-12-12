@@ -35,7 +35,7 @@ exports.handler = async (event, context) => {
     const response = await axios.get(originalAddress);
 
     // Modify the fetched HTML content to update URLs for assets
-    const modifiedContent = response.data; //updateAssetUrls(response.data, originalAddress);
+    const modifiedContent = updateAssetUrls(response.data, originalAddress);
 
     return {
       statusCode: response.status,
@@ -52,6 +52,8 @@ exports.handler = async (event, context) => {
 };
 
 function updateAssetUrls(htmlContent, originalAddress) {
+
+    return htmlContent;
     // Extract the origin from the originalAddress
     const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
   
