@@ -72,8 +72,8 @@ function updateAssetUrls(htmlContent, originalAddress) {
     const updatedContent = new XMLSerializer().serializeToString(doc);
 
     // Extract head and body sections
-    const head = doc.head.innerHTML;
-    const body = doc.body.innerHTML;
+    const head = new XMLSerializer().serializeToString(doc.head);
+    const body = new XMLSerializer().serializeToString(doc.body);
 
     return { head, body };
   } catch (error) {
