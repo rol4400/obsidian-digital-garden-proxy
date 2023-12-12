@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.innerHTML = data.body;
   
         // Set the head content
-        document.head.innerHTML = data.head;
+        // document.head.innerHTML = data.head;
   
         // Load stylesheets dynamically
         loadStylesheets(data.head);
