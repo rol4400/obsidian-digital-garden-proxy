@@ -43,11 +43,14 @@ exports.handler = async (req, context) => {
         // Make an API call to get the page content
         const response = await axios.get(linkInfo.address);
 
+        // Inject the warning alert
+        const updatedHtml = injectWarningAlert(response.data, linkInfo.expirationTim);
+
         // Update links and extract head and body sections
         const {
             head,
             body
-        } = updateAssetUrls(response.data, linkInfo.address, "token");
+        } = updateAssetUrls(updatedHtml, linkInfo.address, "token");
 
         // Return the modified response
         return {
@@ -151,13 +154,39 @@ function updateAssetUrls(htmlContent, originalAddress, token) {
     }
 }
 
-// Helper function to get custom error page content
-async function getErrorPage(statusCode, errorMessage) {
+function injectWarningAlert(htmlContent, expirationTime) {
     try {
-        const response = await axios.get(`${statusCode}.html`);
-        return response.data;
+        const $ = cheerio.load(htmlContent);
+
+        // Calculate days remaining
+        const daysRemaining = Math.ceil((expirationTime - Date.now()) / (1000 * 60 * 60 * 24));
+
+        // Create the warning message
+        const warningMessage = `This link will expire in ${daysRemaining} ${daysRemaining === 1 ? 'day' : 'days'}`;
+
+        // Construct the warning alert HTML
+        const warningAlert = `
+            <div class="alert fade alert-simple alert-warning alert-dismissible text-left font__family-montserrat font__size-16 font__weight-light brk-library-rendered rendered show" role="alert" data-brk-library="component__alert">
+                <button type="button" class="close font__size-18" data-dismiss="alert">
+                    <span aria-hidden="true">
+                        <i class="fa fa-times warning"></i>
+                    </span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <i class="start-icon fa fa-exclamation-triangle faa-flash animated"></i>
+                <strong class="font__weight-semibold">Warning!</strong> ${warningMessage}
+            </div>
+        `;
+
+        // Inject the warning alert at the beginning of the body
+        $('body').prepend(warningAlert);
+
+        // Serialize the modified document back to HTML
+        const updatedContent = $.html();
+
+        return updatedContent;
     } catch (error) {
-        // If the custom error page is not found, return a simple error message
-        return `<html><head><title>${errorMessage}</title></head><body><h1>${errorMessage}</h1></body></html>`;
+        console.error('Error in injectWarningAlert:', error);
+        return htmlContent;
     }
 }
