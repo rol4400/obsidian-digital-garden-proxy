@@ -6,9 +6,9 @@ const cheerio = require('cheerio');
 const deta = Deta(process.env.DETA_PROJECT_KEY);
 const linksTable = deta.Base('Obsidian_Links');
 
-exports.handler = async (event, context) => {
+exports.handler = async (req, context) => {
   try {
-    
+
     const { token } = req.queryStringParameters;
 
     // Check if the token exists
