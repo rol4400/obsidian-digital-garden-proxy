@@ -167,7 +167,7 @@ function injectWarningAlert(htmlContent, expirationTime) {
         // Construct the warning alert HTML
         const warningAlert = `
             <div id="toast" class="show">
-                <div id="img">&#128336;</div>
+                <div id="img">🕑</div>
                 <div id="desc">${warningMessage}</div>
             </div>
             <style>
@@ -209,7 +209,7 @@ function injectWarningAlert(htmlContent, expirationTime) {
                     overflow: hidden;
                     white-space: nowrap;
                 }
-                
+
                 #toast.show {
                     visibility: visible;
                     -webkit-animation: fadein 0.5s, expand 0.5s 0.5s, stay 3s 1s, shrink 0.5s 2s, fadeout 0.5s 2.5s;
