@@ -176,7 +176,7 @@ function injectWarningAlert(htmlContent, expirationTime) {
                     max-width: 50px;
                     height: 50px;
                     margin: auto;
-                    background-color: #333;
+                    background-color: #ffa500; /* Orange color */
                     color: #fff;
                     text-align: center;
                     border-radius: 2px;
@@ -184,7 +184,7 @@ function injectWarningAlert(htmlContent, expirationTime) {
                     z-index: 1;
                     left: 0;
                     right: 0;
-                    bottom: 30px;
+                    top: 0; /* Fixed position at the top */
                     font-size: 17px;
                     white-space: nowrap;
                 }
@@ -257,7 +257,7 @@ function injectWarningAlert(htmlContent, expirationTime) {
                         x.className = "show";
                         setTimeout(function () { x.className = x.className.replace("show", ""); }, 5000);
                     }
-                    launch_toast();
+                    setTimeout(launch_toast, 1000); // Add 1-second delay
                 });
             </script>
         `;
