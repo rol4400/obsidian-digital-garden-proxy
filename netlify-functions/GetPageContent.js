@@ -12,9 +12,10 @@ const linksTable = deta.Base('Obsidian_Links');
 exports.handler = async (req, context) => {
     try {
 
-        const {
-            token
-        } = req.queryStringParameters;
+        // const {
+        //     token
+        // } = req.queryStringParameters;
+        const { token, hash, ...userData } = req.queryStringParameters;
 
         // Check if the token exists
         if (!token) {
@@ -41,9 +42,34 @@ exports.handler = async (req, context) => {
             };
         }
 
-        const { telegramId } = JSON.parse(req.body);
+        // Extract data for telegram ID
+        const botToken = process.env.TELE_BOT_TOKEN; // Replace with your actual Telegram bot token
 
-        console.log(telegramId);
+        console.log(userData);
+
+        // Construct data_check_string
+        const dataCheckArray = Object.keys(userData)
+            .sort()
+            .map((key) => `${key}=${userData[key]}`);
+        const dataCheckString = dataCheckArray.join('\n');
+
+        // Calculate secret_key
+        const secretKey = crypto.createHash('sha256').update(botToken).digest('hex');
+
+        // Calculate expectedHash using HMAC-SHA-256
+        const expectedHash = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
+
+        console.log(secretKey);
+        console.log(expectedHash);
+
+        // Compare the received hash with the expected hash
+        if (hash === expectedHash) {
+            // Hashes match, user is authenticated
+            return res.json({ success: true, message: 'User is authenticated.' });
+        } else {
+            // Hashes do not match, unauthorized user
+            return res.status(401).json({ success: false, message: 'Unauthorized user.' });
+        }
 
         // Make an API call to get the page content
         const response = await axios.get(linkInfo.address);
