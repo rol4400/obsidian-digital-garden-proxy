@@ -1,17 +1,41 @@
 // getPageContent.js
+const { Deta } = require('deta');
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+const deta = Deta(process.env.DETA_PROJECT_KEY);
+const linksTable = deta.Base('Obsidian_Links');
+
 exports.handler = async (event, context) => {
   try {
+    
+    const { token } = req.queryStringParameters;
 
-    const ORIGINAL_ADDRESS = "https://ryan-obsidian-notes.vercel.app/educations/tgw-s-visit-to-korea/testing/";
+    // Check if the token exists
+    if (!token) {
+      return {
+        statusCode: 403,
+        body: "The link given was invalid, please ask for another",
+      };
+    }
+
+    // Retrieve link information from Deta.Base
+    const linkInfo = await linksTable.get(token);
+
+    // Check if the link has expired
+    if (!linkInfo || Date.now() > linkInfo.expirationTime) {
+      return {
+        statusCode: 403,
+        body: "The link given is invalid or may have expired, please ask for another",
+      };
+    }
+
 
     // Make an API call to get the page content
-    const response = await axios.get(ORIGINAL_ADDRESS);
+    const response = await axios.get(linkInfo.address);
 
     // Update links and extract head and body sections
-    const { head, body }  = updateAssetUrls(response.data, ORIGINAL_ADDRESS, "token");
+    const { head, body }  = updateAssetUrls(response.data, linkInfo.address, "token");
 
     // Return the modified response
     return {
