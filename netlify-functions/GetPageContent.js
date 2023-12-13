@@ -2,9 +2,11 @@
 const {
     Deta
 } = require('deta');
+
 const axios = require('axios');
 const cheerio = require('cheerio');
 const moment = require('moment');
+const crypto = require('crypto');
 
 const deta = Deta(process.env.DETA_PROJECT_KEY);
 const linksTable = deta.Base('Obsidian_Links');
@@ -61,15 +63,6 @@ exports.handler = async (req, context) => {
 
         console.log(secretKey);
         console.log(expectedHash);
-
-        // Compare the received hash with the expected hash
-        if (hash === expectedHash) {
-            // Hashes match, user is authenticated
-            return res.json({ success: true, message: 'User is authenticated.' });
-        } else {
-            // Hashes do not match, unauthorized user
-            return res.status(401).json({ success: false, message: 'Unauthorized user.' });
-        }
 
         // Make an API call to get the page content
         const response = await axios.get(linkInfo.address);
