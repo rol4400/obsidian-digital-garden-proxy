@@ -44,11 +44,8 @@ exports.handler = async (req, context) => {
             };
         }
 
-        // Extract data for telegram ID
+        // Extract key for telegram ID
         const botToken = process.env.TELE_BOT_TOKEN; // Replace with your actual Telegram bot token
-
-        console.log(userData);
-
         const secretKey =  crypto.createHash('sha256')
             .update(botToken)
             .digest();
@@ -64,20 +61,27 @@ exports.handler = async (req, context) => {
             .update(dataCheckString)
             .digest('hex');
 
-        // // Construct data_check_string
-        // const dataCheckArray = Object.keys(userData)
-        //     .sort()
-        //     .map((key) => `${key}=${userData[key]}`);
-        // const dataCheckString = dataCheckArray.join('\n');
+        // Invalid login hash
+        if (hmac !== hash) {
+            return {
+                statusCode: 302,
+                headers: {
+                    'Location': `auth.html`,
+                },
+                body: 'Failed Telegram authentication',
+            };
+        }
 
-        // // Calculate secret_key
-        // const secretKey = crypto.createHash('sha256').update(botToken).digest('hex');
-
-        // // Calculate expectedHash using HMAC-SHA-256
-        // const expectedHash = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
-
-        console.log(secretKey);
-        console.log(hmac);
+        // Check if the user is registered
+        if (!linkInfo.telegramIds.includes(userTelegramId)) {
+            return {
+                statusCode: 302,
+                headers: {
+                    'Location': `403.html`,
+                },
+                body: 'Telegram ID is not authenticated to access this page',
+            };
+        }
 
         // Make an API call to get the page content
         const response = await axios.get(linkInfo.address);
