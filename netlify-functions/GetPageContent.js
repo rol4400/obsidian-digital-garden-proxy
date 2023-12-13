@@ -72,11 +72,13 @@ function updateAssetUrls(htmlContent, originalAddress, token) {
         $(element).attr('href', resolvedUrl.toString());
       });
   
-      // Update specific URLs like "/graph.json" to refer to the original domain
-      $('[href="/graph.json"], [src="/graph.json"]').each((index, element) => {
-        const resolvedUrl = new URL('/graph.json', originalDomain).toString();
-        $(element).attr('href', resolvedUrl);
-        $(element).attr('src', resolvedUrl);
+      // Update inline JavaScript fetch calls
+      $('script').each((index, element) => {
+        const scriptContent = $(element).html();
+        if (scriptContent.includes('fetch')) {
+          const updatedScript = scriptContent.replace(/fetch\('\/graph.json'\)/g, `fetch('${originalDomain}/graph.json?token=${token}')`);
+          $(element).html(updatedScript);
+        }
       });
   
       // Serialize the modified document back to HTML
@@ -91,5 +93,4 @@ function updateAssetUrls(htmlContent, originalAddress, token) {
       return { head: '', body: htmlContent };
     }
   }
-  
   
