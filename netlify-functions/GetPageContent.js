@@ -6,10 +6,11 @@ exports.handler = async (event, context) => {
     // Make an API call to get the page content
     const response = await axios.get('https://ryan-obsidian-notes.vercel.app/educations/tgw-s-visit-to-korea/testing/');
 
+    // Update links
+    const updatedHTML = updateAssetUrls(response.data);
+
     // Extract head and body sections
-    const { head, body } = extractHeadAndBody(response.data);
-
-
+    const { head, body } = extractHeadAndBody(updatedHTML, "https://ryan-obsidian-notes.vercel.app/educations/tgw-s-visit-to-korea/testing/");
 
     // Return the modified response
     return {
@@ -48,3 +49,22 @@ function extractHeadAndBody(htmlContent) {
   return { head: '', body: htmlContent };
 }
 
+function updateAssetUrls(htmlContent, originalAddress) {
+    try {
+      const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
+  
+      // Replace URLs for assets with the original domain using synchronous replace
+      const updatedContent = htmlContent.replace(/(src|href)="(\/styles\/.*?)"/g, (match, attribute, path) => {
+        const resolvedUrl = baseUrl + path;
+        return `${attribute}="${resolvedUrl}"`;
+      });
+  
+      console.log(updatedContent);
+  
+      return updatedContent;
+    } catch (error) {
+      console.error('Error in updateAssetUrls:', error);
+      return htmlContent; // Return the original content in case of an error
+    }
+  }
+  
