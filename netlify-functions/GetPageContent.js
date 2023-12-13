@@ -10,11 +10,8 @@ exports.handler = async (event, context) => {
     // Make an API call to get the page content
     const response = await axios.get(ORIGINAL_ADDRESS);
 
-    // Update links
-    const updatedHTML = updateAssetUrls(response.data, ORIGINAL_ADDRESS, "token");
-
-    // Extract head and body sections
-    const { head, body } = extractHeadAndBody(updatedHTML);
+    // Update links and extract head and body sections
+    const { head, body }  = updateAssetUrls(response.data, ORIGINAL_ADDRESS, "token");
 
     // Return the modified response
     return {
