@@ -59,7 +59,7 @@ function updateAssetUrls(htmlContent, originalAddress, token) {
       // Update URLs for style and script assets with the original domain
       $('link[href], script[src]').each((index, element) => {
         const path = $(element).attr('href') || $(element).attr('src');
-        const resolvedUrl = originalDomain + path;
+        const resolvedUrl = new URL(path, originalDomain).toString();
         $(element).attr('href', resolvedUrl);
         $(element).attr('src', resolvedUrl);
       });
@@ -67,8 +67,9 @@ function updateAssetUrls(htmlContent, originalAddress, token) {
       // Update href links to append the token query parameter
       $('a[href^="/"]').each((index, element) => {
         const path = $(element).attr('href');
-        const resolvedUrl = path + `?token=${token}`;
-        $(element).attr('href', resolvedUrl);
+        const resolvedUrl = new URL(path, originalDomain);
+        resolvedUrl.searchParams.set('token', token);
+        $(element).attr('href', resolvedUrl.toString());
       });
   
       // Serialize the modified document back to HTML
@@ -83,3 +84,4 @@ function updateAssetUrls(htmlContent, originalAddress, token) {
       return { head: '', body: htmlContent };
     }
   }
+  
