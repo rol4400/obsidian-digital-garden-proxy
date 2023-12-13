@@ -49,7 +49,7 @@ exports.handler = async (req, context) => {
 
         console.log(userData);
 
-        const secretKey = createHash('sha256')
+        const secretKey =  crypto.createHash('sha256')
             .update(botToken)
             .digest();
 
@@ -60,7 +60,7 @@ exports.handler = async (req, context) => {
             .join('\n');
 
         // run a cryptographic hash function over the data to be authenticated and the secret
-        const hmac = createHmac('sha256', secretKey)
+        const hmac =  crypto.createHmac('sha256', secretKey)
             .update(dataCheckString)
             .digest('hex');
 
