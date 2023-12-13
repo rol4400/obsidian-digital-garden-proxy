@@ -49,20 +49,35 @@ exports.handler = async (req, context) => {
 
         console.log(userData);
 
-        // Construct data_check_string
-        const dataCheckArray = Object.keys(userData)
+        const secretKey = createHash('sha256')
+            .update(botToken)
+            .digest();
+
+        // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
+        const dataCheckString = Object.keys(userData)
             .sort()
-            .map((key) => `${key}=${userData[key]}`);
-        const dataCheckString = dataCheckArray.join('\n');
+            .map(key => (`${key}=${userData[key]}`))
+            .join('\n');
 
-        // Calculate secret_key
-        const secretKey = crypto.createHash('sha256').update(botToken).digest('hex');
+        // run a cryptographic hash function over the data to be authenticated and the secret
+        const hmac = createHmac('sha256', secretKey)
+            .update(dataCheckString)
+            .digest('hex');
 
-        // Calculate expectedHash using HMAC-SHA-256
-        const expectedHash = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
+        // // Construct data_check_string
+        // const dataCheckArray = Object.keys(userData)
+        //     .sort()
+        //     .map((key) => `${key}=${userData[key]}`);
+        // const dataCheckString = dataCheckArray.join('\n');
+
+        // // Calculate secret_key
+        // const secretKey = crypto.createHash('sha256').update(botToken).digest('hex');
+
+        // // Calculate expectedHash using HMAC-SHA-256
+        // const expectedHash = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
 
         console.log(secretKey);
-        console.log(expectedHash);
+        console.log(hmac);
 
         // Make an API call to get the page content
         const response = await axios.get(linkInfo.address);
