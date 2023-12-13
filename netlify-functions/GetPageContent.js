@@ -52,43 +52,36 @@ function extractHeadAndBody(htmlContent) {
   return { head: '', body: htmlContent };
 }
 
-// Update the updateAssetUrls function in getPageContent.js
+// Update the updateAssetUrls function
 function updateAssetUrls(htmlContent, originalAddress, token) {
     try {
+      const $ = cheerio.load(htmlContent);
       const originalDomain = originalAddress.split('/').slice(0, 3).join('/');
   
-      // Parse the HTML content using DOMParser
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(htmlContent, 'text/html');
-  
       // Update URLs for style and script assets with the original domain
-      const styleScriptElements = doc.querySelectorAll('link[href], script[src]');
-      styleScriptElements.forEach((element) => {
-        const path = element.getAttribute('href') || element.getAttribute('src');
+      $('link[href], script[src]').each((index, element) => {
+        const path = $(element).attr('href') || $(element).attr('src');
         const resolvedUrl = originalDomain + path;
-        element.setAttribute('href', resolvedUrl);
-        element.setAttribute('src', resolvedUrl);
+        $(element).attr('href', resolvedUrl);
+        $(element).attr('src', resolvedUrl);
       });
   
       // Update href links to append the token query parameter
-      const hrefElements = doc.querySelectorAll('a[href^="/"]');
-      hrefElements.forEach((element) => {
-        const path = element.getAttribute('href');
+      $('a[href^="/"]').each((index, element) => {
+        const path = $(element).attr('href');
         const resolvedUrl = path + `?token=${token}`;
-        element.setAttribute('href', resolvedUrl);
+        $(element).attr('href', resolvedUrl);
       });
   
       // Serialize the modified document back to HTML
-      const updatedContent = new XMLSerializer().serializeToString(doc);
+      const updatedContent = $.html();
   
       // Extract head and body sections
-      const head = doc.head.innerHTML;
-      const body = doc.body.innerHTML;
+      const headBodyContent = extractHeadAndBody(updatedContent);
   
-      return { head, body };
+      return headBodyContent;
     } catch (error) {
       console.error('Error in updateAssetUrls:', error);
-      return { head: '', body: htmlContent }; // Return the original content for both head and body in case of an error
+      return { head: '', body: htmlContent };
     }
   }
-  
