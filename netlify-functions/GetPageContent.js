@@ -10,30 +10,25 @@ exports.handler = async (req, context) => {
   try {
 
     const { token } = req.queryStringParameters;
-  // Check if the token exists
-  if (!token) {
-    return {
-      statusCode: 403,
-      headers: {
-        'Content-Type': 'text/html',
-      },
-      body: await getErrorPage(403, "The link given was invalid, please ask for another"),
-    };
-  }
 
-  // Retrieve link information from Deta.Base
-  const linkInfo = await linksTable.get(token);
-
-  // Check if the link has expired
-  if (!linkInfo || Date.now() > linkInfo.expirationTime) {
-    return {
-      statusCode: 403,
-      headers: {
-        'Content-Type': 'text/html',
-      },
-      body: await getErrorPage(403, "The link given is invalid or may have expired, please ask for another"),
+    // Check if the token exists
+    if (!token) {
+      return {
+        statusCode: 403,
+        body: await getErrorPage(403, "The link given was invalid, please ask for another"),
     };
-  }
+    }
+
+    // Retrieve link information from Deta.Base
+    const linkInfo = await linksTable.get(token);
+
+    // Check if the link has expired
+    if (!linkInfo || Date.now() > linkInfo.expirationTime) {
+      return {
+        statusCode: 403,
+        body: await getErrorPage(403, "The link given was invalid, please ask for another"),
+    };
+    }
 
 
     // Make an API call to get the page content
@@ -43,25 +38,18 @@ exports.handler = async (req, context) => {
     const { head, body }  = updateAssetUrls(response.data, linkInfo.address, "token");
 
     // Return the modified response
-} catch (error) {
-    console.error('Error:', error);
-
-    // Customize error response based on the error type
-    let statusCode = 500;
-    let errorMessage = 'Internal Server Error';
-
-    if (error.response && error.response.status) {
-      statusCode = error.response.status;
-      errorMessage = `Error: ${error.response.status}`;
-    }
-
-    // Return the error response with custom error page
     return {
-      statusCode,
+      statusCode: response.status,
       headers: {
         'Content-Type': 'text/html',
       },
-      body: await getErrorPage(statusCode, errorMessage),
+      body: `<html>${head}<body>${body}</body></html>`,
+    };
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      statusCode: 500,
+      body: await getErrorPage(500, "Internal Server Error"),
     };
   }
 };
