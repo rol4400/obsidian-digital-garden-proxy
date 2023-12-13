@@ -20,7 +20,7 @@ exports.handler = async (req, context) => {
             return {
                 statusCode: 302,
                 headers: {
-                    'Location': `${process.env.BASE_URL}/403.html`,
+                    'Location': `403.html`,
                 },
                 body: '',
             };
@@ -34,7 +34,7 @@ exports.handler = async (req, context) => {
             return {
                 statusCode: 302,
                 headers: {
-                    'Location': `${process.env.BASE_URL}/403.html`,
+                    'Location': `403.html`,
                 },
                 body: '',
             };
@@ -71,7 +71,7 @@ exports.handler = async (req, context) => {
         return {
             statusCode: 500,
             headers: {
-                'Location': `${process.env.BASE_URL}/${statusCode}.html`,
+                'Location': `${statusCode}.html`,
             },
             body: '',
         };
@@ -154,7 +154,7 @@ function updateAssetUrls(htmlContent, originalAddress, token) {
 // Helper function to get custom error page content
 async function getErrorPage(statusCode, errorMessage) {
     try {
-        const response = await axios.get(`${process.env.BASE_URL}/${statusCode}.html`);
+        const response = await axios.get(`${statusCode}.html`);
         return response.data;
     } catch (error) {
         // If the custom error page is not found, return a simple error message
