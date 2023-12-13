@@ -207,8 +207,8 @@ function injectWarningAlert(htmlContent, expirationTime) {
                 #toast #desc {
                     color: #fff;
                     padding: 16px;
-                    overflow: hidden;
-                    white-space: nowrap;
+                    overflow: hidden !important;
+                    white-space: nowrap !important;
                     font-family: "Times New Roman";
                 }
 
@@ -251,11 +251,11 @@ function injectWarningAlert(htmlContent, expirationTime) {
                 }
                 @-webkit-keyframes fadeout {
                     from { top: 30px; opacity: 1; visibility: visible }
-                    to { top: 60px; opacity: 0; visibility: hidden }
+                    to { top: 0px; opacity: 0; visibility: hidden }
                 }
                 @keyframes fadeout {
                     from { top: 30px; opacity: 1; visibility: visible }
-                    to { top: 60px; opacity: 0; visibility: hidden }
+                    to { top: 0px; opacity: 0; visibility: hidden }
                 }
             </style>
             <script>
