@@ -9,6 +9,8 @@ exports.handler = async (event, context) => {
     // Extract head and body sections
     const { head, body } = extractHeadAndBody(response.data);
 
+
+
     // Return the modified response
     return {
       statusCode: response.status,
@@ -26,17 +28,23 @@ exports.handler = async (event, context) => {
   }
 };
 
+// Update the extractHeadAndBody function in getPageContent.js
 function extractHeadAndBody(htmlContent) {
-  // Implement your logic to extract head and body sections
-  // For simplicity, let's assume you have specific markers in the HTML
-
+  // Find the first occurrence of <head> and <body>
   const headStartIndex = htmlContent.indexOf('<head>');
   const headEndIndex = htmlContent.indexOf('</head>');
   const bodyStartIndex = htmlContent.indexOf('<body>');
   const bodyEndIndex = htmlContent.indexOf('</body>');
 
-  const head = htmlContent.substring(headStartIndex, headEndIndex + '</head>'.length);
-  const body = htmlContent.substring(bodyStartIndex + '<body>'.length, bodyEndIndex);
+  // If <head> and <body> are found, extract the content
+  if (headStartIndex !== -1 && headEndIndex !== -1 && bodyStartIndex !== -1 && bodyEndIndex !== -1) {
+    const head = htmlContent.substring(headStartIndex, headEndIndex + '</head>'.length);
+    const body = htmlContent.substring(bodyStartIndex + '<body>'.length, bodyEndIndex);
 
-  return { head, body };
+    return { head, body };
+  }
+
+  // If not found, return the original content
+  return { head: '', body: htmlContent };
 }
+
