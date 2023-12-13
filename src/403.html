@@ -20,7 +20,7 @@
 
 #key{
     position:absolute;
-    top:77%;
+    top:50%;
     left:-33%;
 }
 
@@ -30,13 +30,6 @@
   top:55%;
   width:100%;
   text-align:center;
-}
-
-#credit{
-    position:absolute;
-    bottom:0;
-    width:100%;
-    text-align:center;
 }
 
 a{
@@ -57,39 +50,6 @@ a{
         </div>
     
         <p id="text">The link you have is either invalid or expired. Please get a new one</p>
-       
-
-        <script>
-            var lock = document.querySelector('#lock');
-var key = document.querySelector('#key');
-
-
-function keyAnimate(){
-    dynamics.animate(key, {
-        translateX: 33
-    }, {
-        type:dynamics.easeInOut,
-        duration:500,
-        complete:lockAnimate
-    })
-}
-
-
-function lockAnimate(){
-    dynamics.animate(lock, {
-        rotateZ:-5,
-        scale:0.9
-        }, {
-            type:dynamics.bounce,
-            duration:3000,
-            complete:keyAnimate
-        })
-}
-
-
-setInterval(keyAnimate, 3000);
-        </script>
-
 
     </body>
 </html>
