@@ -72,6 +72,9 @@ exports.handler = async (req, context) => {
             };
         }
 
+        console.log(linkInfo.telegramIds);
+        console.log(userData["id"]);
+
         // Check if the user is registered
         if (!linkInfo.telegramIds.includes(userData["id"])) {
             return {
