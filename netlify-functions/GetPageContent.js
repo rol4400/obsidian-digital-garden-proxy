@@ -173,7 +173,7 @@ function injectWarningAlert(htmlContent, expirationTime) {
             </div>
 
             <script async src="https://telegram.org/js/telegram-widget.js?5"
-                    data-telegram-login="obsidian_notetaker_bot" 
+                    data-telegram-login="ryans_notes_authenticator_bot" 
                     data-size="large"
                     data-radius="10"
                     data-auth-url="/testing">
