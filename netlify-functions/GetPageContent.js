@@ -73,7 +73,7 @@ exports.handler = async (req, context) => {
         }
 
         // Check if the user is registered
-        if (!linkInfo.telegramIds.includes(userTelegramId)) {
+        if (!linkInfo.telegramIds.includes(userData["id"])) {
             return {
                 statusCode: 302,
                 headers: {
