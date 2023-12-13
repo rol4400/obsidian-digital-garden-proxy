@@ -44,7 +44,7 @@ exports.handler = async (req, context) => {
         const response = await axios.get(linkInfo.address);
 
         // Inject the warning alert
-        const updatedHtml = injectWarningAlert(response.data, linkInfo.expirationTim);
+        const updatedHtml = injectWarningAlert(response.data, linkInfo.expirationTime);
 
         // Update links and extract head and body sections
         const {
@@ -167,7 +167,7 @@ function injectWarningAlert(htmlContent, expirationTime) {
         // Construct the warning alert HTML
         const warningAlert = `
             <div id="toast" class="show">
-                <div id="img">Icon</div>
+                <div id="img">&#128336;</div>
                 <div id="desc">${warningMessage}</div>
             </div>
             <style>
@@ -188,6 +188,7 @@ function injectWarningAlert(htmlContent, expirationTime) {
                     font-size: 17px;
                     white-space: nowrap;
                 }
+
                 #toast #img {
                     width: 50px;
                     height: 50px;
@@ -195,15 +196,20 @@ function injectWarningAlert(htmlContent, expirationTime) {
                     padding-top: 16px;
                     padding-bottom: 16px;
                     box-sizing: border-box;
-                    background-color: #111;
+                    background-color: #ff8c00; /* Orange color */
                     color: #fff;
+                    font-size: 24px; /* Adjust the font size as needed */
+                    border-radius: 50%; /* Make it a circle */
+                    text-align: center;
                 }
+
                 #toast #desc {
                     color: #fff;
                     padding: 16px;
                     overflow: hidden;
                     white-space: nowrap;
                 }
+                
                 #toast.show {
                     visibility: visible;
                     -webkit-animation: fadein 0.5s, expand 0.5s 0.5s, stay 3s 1s, shrink 0.5s 2s, fadeout 0.5s 2.5s;
@@ -242,12 +248,12 @@ function injectWarningAlert(htmlContent, expirationTime) {
                     to { min-width: 50px; }
                 }
                 @-webkit-keyframes fadeout {
-                    from { top: 30px; opacity: 1; }
-                    to { top: 60px; opacity: 0; }
+                    from { top: 30px; opacity: 1; visibility: visible }
+                    to { top: 60px; opacity: 0; visibility: hidden }
                 }
                 @keyframes fadeout {
-                    from { top: 30px; opacity: 1; }
-                    to { top: 60px; opacity: 0; }
+                    from { top: 30px; opacity: 1; visibility: visible }
+                    to { top: 60px; opacity: 0; visibility: hidden }
                 }
             </style>
             <script>
@@ -257,7 +263,7 @@ function injectWarningAlert(htmlContent, expirationTime) {
                         x.className = "show";
                         setTimeout(function () { x.className = x.className.replace("show", ""); }, 5000);
                     }
-                    setTimeout(launch_toast, 1000); // Add 1-second delay
+                    setTimeout(launch_toast, 2000); // Add 2-second delay
                 });
             </script>
         `;
