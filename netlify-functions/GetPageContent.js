@@ -176,7 +176,7 @@ function injectWarningAlert(htmlContent, expirationTime) {
                     max-width: 50px;
                     height: 50px;
                     margin: auto;
-                    background-color: #ffa500; /* Orange color */
+                    background-color: #333;
                     color: #fff;
                     text-align: center;
                     border-radius: 2px;
@@ -184,7 +184,7 @@ function injectWarningAlert(htmlContent, expirationTime) {
                     z-index: 1;
                     left: 0;
                     right: 0;
-                    top: 0; /* Fixed position at the top */
+                    top: 30px;
                     font-size: 17px;
                     white-space: nowrap;
                 }
@@ -210,12 +210,12 @@ function injectWarningAlert(htmlContent, expirationTime) {
                     animation: fadein 0.5s, expand 0.5s 0.5s, stay 3s 1s, shrink 0.5s 4s, fadeout 0.5s 4.5s;
                 }
                 @-webkit-keyframes fadein {
-                    from { bottom: 0; opacity: 0; }
-                    to { bottom: 30px; opacity: 1; }
+                    from { top: 0; opacity: 0; }
+                    to { top: 30px; opacity: 1; }
                 }
                 @keyframes fadein {
-                    from { bottom: 0; opacity: 0; }
-                    to { bottom: 30px; opacity: 1; }
+                    from { top: 0; opacity: 0; }
+                    to { top: 30px; opacity: 1; }
                 }
                 @-webkit-keyframes expand {
                     from { min-width: 50px; }
@@ -242,12 +242,12 @@ function injectWarningAlert(htmlContent, expirationTime) {
                     to { min-width: 50px; }
                 }
                 @-webkit-keyframes fadeout {
-                    from { bottom: 30px; opacity: 1; }
-                    to { bottom: 60px; opacity: 0; }
+                    from { top: 30px; opacity: 1; }
+                    to { top: 60px; opacity: 0; }
                 }
                 @keyframes fadeout {
-                    from { bottom: 30px; opacity: 1; }
-                    to { bottom: 60px; opacity: 0; }
+                    from { top: 30px; opacity: 1; }
+                    to { top: 60px; opacity: 0; }
                 }
             </style>
             <script>
