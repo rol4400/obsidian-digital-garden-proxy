@@ -41,6 +41,10 @@ exports.handler = async (req, context) => {
             };
         }
 
+        const { telegramId } = JSON.parse(req.body);
+
+        console.log(telegramId);
+
         // Make an API call to get the page content
         const response = await axios.get(linkInfo.address);
 
@@ -172,14 +176,7 @@ function injectWarningAlert(htmlContent, expirationTime) {
                 <div id="desc">${warningMessage}</div>
             </div>
 
-            <script async src="https://telegram.org/js/telegram-widget.js?5"
-                    data-telegram-login="ryans_notes_authenticator_bot" 
-                    data-size="large"
-                    data-radius="10"
-                    data-auth-url="/testing">
-            </script>
-            
-            <style>
+           <style>
                 #toast {
                     visibility: hidden;
                     max-width: 50px;
