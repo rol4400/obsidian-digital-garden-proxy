@@ -4,6 +4,7 @@ const {
 } = require('deta');
 const axios = require('axios');
 const cheerio = require('cheerio');
+const moment = require('moment');
 
 const deta = Deta(process.env.DETA_PROJECT_KEY);
 const linksTable = deta.Base('Obsidian_Links');
@@ -159,10 +160,10 @@ function injectWarningAlert(htmlContent, expirationTime) {
         const $ = cheerio.load(htmlContent);
 
         // Calculate days remaining
-        const daysRemaining = Math.ceil((expirationTime - Date.now()) / (1000 * 60 * 60 * 24));
+        const timeRemaining = moment(expirationTime).fromNow(true);
 
         // Create the warning message
-        const warningMessage = `This link will expire in ${daysRemaining} ${daysRemaining === 1 ? 'day' : 'days'}`;
+        const warningMessage = `This link will expire in ${timeRemaining}`;
 
         // Construct the warning alert HTML
         const warningAlert = `
