@@ -175,6 +175,8 @@ function injectWarningAlert(htmlContent, expirationTime) {
                 #toast {
                     visibility: hidden;
                     max-width: 50px;
+                    max-height: 50px;
+                    overflow: hidden !important;
                     height: 50px;
                     margin: auto;
                     color: #fff;
