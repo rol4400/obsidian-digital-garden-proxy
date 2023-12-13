@@ -3,14 +3,17 @@ const axios = require('axios');
 
 exports.handler = async (event, context) => {
   try {
+
+    const ORIGINAL_ADDRESS = "https://ryan-obsidian-notes.vercel.app/educations/tgw-s-visit-to-korea/testing/";
+
     // Make an API call to get the page content
-    const response = await axios.get('https://ryan-obsidian-notes.vercel.app/educations/tgw-s-visit-to-korea/testing/');
+    const response = await axios.get(ORIGINAL_ADDRESS);
 
     // Update links
-    const updatedHTML = updateAssetUrls(response.data);
+    const updatedHTML = updateAssetUrls(response.data, ORIGINAL_ADDRESS, "token");
 
     // Extract head and body sections
-    const { head, body } = extractHeadAndBody(updatedHTML, "https://ryan-obsidian-notes.vercel.app/educations/tgw-s-visit-to-korea/testing/");
+    const { head, body } = extractHeadAndBody(updatedHTML);
 
     // Return the modified response
     return {
@@ -49,22 +52,43 @@ function extractHeadAndBody(htmlContent) {
   return { head: '', body: htmlContent };
 }
 
-function updateAssetUrls(htmlContent, originalAddress) {
+// Update the updateAssetUrls function in getPageContent.js
+function updateAssetUrls(htmlContent, originalAddress, token) {
     try {
-      const baseUrl = originalAddress.split('/').slice(0, 3).join('/');
+      const originalDomain = originalAddress.split('/').slice(0, 3).join('/');
   
-      // Replace URLs for assets with the original domain using synchronous replace
-      const updatedContent = htmlContent.replace(/(src|href)="(\/styles\/.*?)"/g, (match, attribute, path) => {
-        const resolvedUrl = baseUrl + path;
-        return `${attribute}="${resolvedUrl}"`;
+      // Parse the HTML content using DOMParser
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlContent, 'text/html');
+  
+      // Update URLs for style and script assets with the original domain
+      const styleScriptElements = doc.querySelectorAll('link[href], script[src]');
+      styleScriptElements.forEach((element) => {
+        const path = element.getAttribute('href') || element.getAttribute('src');
+        const resolvedUrl = originalDomain + path;
+        element.setAttribute('href', resolvedUrl);
+        element.setAttribute('src', resolvedUrl);
       });
   
-      console.log(updatedContent);
+      // Update href links to append the token query parameter
+      const hrefElements = doc.querySelectorAll('a[href^="/"]');
+      hrefElements.forEach((element) => {
+        const path = element.getAttribute('href');
+        const resolvedUrl = path + `?token=${token}`;
+        element.setAttribute('href', resolvedUrl);
+      });
   
-      return updatedContent;
+      // Serialize the modified document back to HTML
+      const updatedContent = new XMLSerializer().serializeToString(doc);
+  
+      // Extract head and body sections
+      const head = doc.head.innerHTML;
+      const body = doc.body.innerHTML;
+  
+      return { head, body };
     } catch (error) {
       console.error('Error in updateAssetUrls:', error);
-      return htmlContent; // Return the original content in case of an error
+      return { head: '', body: htmlContent }; // Return the original content for both head and body in case of an error
     }
   }
   
