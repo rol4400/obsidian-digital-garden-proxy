@@ -18,10 +18,10 @@ HEADERS['Vary'] = 'Origin'
 exports.handler = async (event, context) => {
   try {
 
-    if (req.httpMethod === 'OPTIONS') {
+    if (event.httpMethod === 'OPTIONS') {
       return { statusCode: '204', HEADERS }
     }
-    
+
     const { address, duration, telegramIds } = JSON.parse(event.body);
 
     // Validate input
