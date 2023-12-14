@@ -6,21 +6,22 @@ const linksTable = deta.Base('Obsidian_Links');
 
 let HEADERS = {
   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Origin',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Max-Age': '8640'
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Max-Age': '8640',
+  'Access-Control-Allow-Origin': '*',
 }
-
-//This solves the "No ‘Access-Control-Allow-Origin’ header is present on the requested resource."
-
-HEADERS['Access-Control-Allow-Origin'] = '*'
-HEADERS['Vary'] = 'Origin'
 
 exports.handler = async (event, context) => {
   try {
 
-    if (event.httpMethod === 'OPTIONS') {
-      return { statusCode: '204', HEADERS }
-    }
+    if (event.httpMethod !== 'POST') {
+      // To enable CORS
+      return {
+        statusCode: 200, // <-- Important!
+        HEADERS,
+        body: 'This was not a POST request!'
+      };
+   }
 
     const { address, duration, telegramIds } = JSON.parse(event.body);
 
