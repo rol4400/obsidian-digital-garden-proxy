@@ -11,24 +11,8 @@ const crypto = require('crypto');
 const deta = Deta(process.env.DETA_PROJECT_KEY);
 const linksTable = deta.Base('Obsidian_Links');
 
-let HEADERS = {
-    'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Origin',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Max-Age': '8640'
-  }
-  
-  //This solves the "No ‘Access-Control-Allow-Origin’ header is present on the requested resource."
-  
-  HEADERS['Access-Control-Allow-Origin'] = '*'
-  HEADERS['Vary'] = 'Origin'
-  
-
 exports.handler = async (req, context) => {
     try {
-
-        if (req.httpMethod === 'OPTIONS') {
-            return { statusCode: '204', HEADERS }
-        }
 
         const { token, hash, ...userData } = req.queryStringParameters;
 
@@ -47,7 +31,7 @@ exports.handler = async (req, context) => {
         const linkInfo = await linksTable.get(token);
 
         // Check if the link has expired
-        if (!linkInfo || Date.now() > linkInfo.expirationTime) {
+        if (linkInfo.expirationTime && Date.now() > linkInfo.expirationTime) {
             return {
                 statusCode: 302,
                 headers: {
@@ -57,53 +41,59 @@ exports.handler = async (req, context) => {
             };
         }
 
-        // Extract key for telegram ID
-        const botToken = process.env.TELE_BOT_TOKEN; // Replace with your actual Telegram bot token
-        const secretKey =  crypto.createHash('sha256')
-            .update(botToken)
-            .digest();
+        if (linkInfo.telegramIds) {
 
-        // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
-        const dataCheckString = Object.keys(userData)
-            .sort()
-            .map(key => (`${key}=${userData[key]}`))
-            .join('\n');
-
-        // run a cryptographic hash function over the data to be authenticated and the secret
-        const hmac =  crypto.createHmac('sha256', secretKey)
-            .update(dataCheckString)
-            .digest('hex');
-
-        // Invalid login hash
-        if (hmac !== hash) {
-            return {
-                statusCode: 302,
-                headers: {
-                    'Location': `auth.html`,
-                },
-                body: 'Failed Telegram authentication',
-            };
-        }
-
-        console.log(linkInfo.telegramIds);
-        console.log(userData["id"]);
-
-        // Check if the user is registered
-        if (!linkInfo.telegramIds.includes(userData["id"])) {
-            return {
-                statusCode: 302,
-                headers: {
-                    'Location': `403.html`,
-                },
-                body: 'Telegram ID is not authenticated to access this page',
-            };
+            // Extract key for telegram ID
+            const botToken = process.env.TELE_BOT_TOKEN; // Replace with your actual Telegram bot token
+            const secretKey =  crypto.createHash('sha256')
+                .update(botToken)
+                .digest();
+    
+            // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
+            const dataCheckString = Object.keys(userData)
+                .sort()
+                .map(key => (`${key}=${userData[key]}`))
+                .join('\n');
+    
+            // run a cryptographic hash function over the data to be authenticated and the secret
+            const hmac =  crypto.createHmac('sha256', secretKey)
+                .update(dataCheckString)
+                .digest('hex');
+    
+            // Invalid login hash
+            if (hmac !== hash) {
+                return {
+                    statusCode: 302,
+                    headers: {
+                        'Location': `auth.html`,
+                    },
+                    body: 'Failed Telegram authentication',
+                };
+            }
+    
+            console.log(linkInfo.telegramIds);
+            console.log(userData["id"]);
+    
+            // Check if the user is registered
+            if (!linkInfo.telegramIds.includes(userData["id"])) {
+                return {
+                    statusCode: 302,
+                    headers: {
+                        'Location': `403.html`,
+                    },
+                    body: 'Telegram ID is not authenticated to access this page',
+                };
+            }
         }
 
         // Make an API call to get the page content
         const response = await axios.get(linkInfo.address);
 
-        // Inject the warning alert
-        const updatedHtml = injectWarningAlert(response.data, linkInfo.expirationTime);
+        // Inject the warning alert if there is an expiration time
+        var updatedHtml = response.data;
+        if (linkInfo.expirationTime) {
+            updatedHtml = injectWarningAlert(response.data, linkInfo.expirationTime);
+        }
 
         // Update links and extract head and body sections
         const {

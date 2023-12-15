@@ -29,6 +29,7 @@ exports.handler = async (event, context) => {
     if (!address || !duration || isNaN(parseInt(duration))) {
       return {
         statusCode: 400,
+        HEADERS,
         body: JSON.stringify({ error: 'Invalid input' }),
       };
     }
@@ -38,12 +39,14 @@ exports.handler = async (event, context) => {
 
     return {
       statusCode: 200,
+      HEADERS,
       body: JSON.stringify({ link: "https://ryan-notes.netlify.app/?token=" + link.key, token: link.key, expirationTime: link.expires }),
     };
   } catch (error) {
     console.error('Error:', error);
     return {
       statusCode: 500,
+      HEADERS,
       body: JSON.stringify({ error: 'Internal Server Error' }),
     };
   }
