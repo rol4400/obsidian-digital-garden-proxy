@@ -219,28 +219,47 @@ function updateAssetUrls(htmlContent, token) {
     try {
         const $ = cheerio.load(htmlContent);
 
-        // Update URLs for style and script assets
-        $('link[href], script[src], img[src]').each((index, element) => {
-            const path = $(element).attr('href') || $(element).attr('src');
-            if (path.startsWith('/')) {
-                $(element).attr('href', `${path}?token=${token}`);
-                $(element).attr('src', `${path}?token=${token}`);
+        // Update URLs for styles, scripts, and images
+        $('[href], [src]').each((index, element) => {
+            const attr = $(element).is('[href]') ? 'href' : 'src';
+            const path = $(element).attr(attr);
+            if (path && path.startsWith('/')) {
+                const updatedUrl = `${path}?token=${token}`;
+                $(element).attr(attr, updatedUrl);
             }
-        });
-
-        // Update href links to append the token query parameter
-        $('a[href^="/"]').each((index, element) => {
-            const path = $(element).attr('href');
-            $(element).attr('href', `${path}?token=${token}`);
         });
 
         // Update inline JavaScript fetch calls
         $('script').each((index, element) => {
             const scriptContent = $(element).html();
             if (scriptContent.includes('fetch')) {
-                $(element).html(scriptContent.replace(/fetch\('\/graph.json'\)/g, `fetch('/graph.json?token=${token}')`));
+                const updatedScript = scriptContent.replace(/fetch\('([^']+)'\)/g, `fetch('$1?token=${token}')`);
+                $(element).html(updatedScript);
             }
         });
+
+        // // Update URLs for style and script assets
+        // $('link[href], script[src], img[src]').each((index, element) => {
+        //     const path = $(element).attr('href') || $(element).attr('src');
+        //     if (path.startsWith('/')) {
+        //         $(element).attr('href', `${path}?token=${token}`);
+        //         $(element).attr('src', `${path}?token=${token}`);
+        //     }
+        // });
+
+        // // Update href links to append the token query parameter
+        // $('a[href^="/"]').each((index, element) => {
+        //     const path = $(element).attr('href');
+        //     $(element).attr('href', `${path}?token=${token}`);
+        // });
+
+        // // Update inline JavaScript fetch calls
+        // $('script').each((index, element) => {
+        //     const scriptContent = $(element).html();
+        //     if (scriptContent.includes('fetch')) {
+        //         $(element).html(scriptContent.replace(/fetch\('\/graph.json'\)/g, `fetch('/graph.json?token=${token}')`));
+        //     }
+        // });
 
         // Serialize the modified document back to HTML
         const updatedContent = $.html();
