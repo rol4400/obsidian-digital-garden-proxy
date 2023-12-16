@@ -14,14 +14,15 @@ const linksTable = deta.Base('Obsidian_Links');
 exports.handler = async (req, context) => {
     try {
 
-        // Extract the query string parameters
+        // Extract the query string parameters and cookie tokens
         var { token, hash, ...userData } = req.queryStringParameters;
+        const tokenCookie = req.headers.cookie;
 
         // If we don't have a token in the query string, try get one from the existing cookies
         if (!token) {
-            // Check if the 'token' cookie is missing or has an empty value
-            const tokenCookie = req.headers.cookie;
             if (!tokenCookie || !tokenCookie.includes('token=')) {
+                
+                // There are no tokens in the query string or the cookies
                 console.log("Token not set")
     
                 return {
@@ -34,22 +35,26 @@ exports.handler = async (req, context) => {
                 };
             }
             
-            // Retrieve token from cookie
+            // There is a token in the cookies, use it
             token = tokenCookie.split(';').find(cookie => cookie.trim().startsWith('token=')).split('=')[1];
         } else {
-            const cookieHeader = `token=${token}; Max-Age=36000; Path=/; HttpOnly`;
 
-            console.log("Skipping to auth to set the right cookies")
-
-            return {
-                statusCode: 302,
-                headers: {
-                    'Location': `/auth.html`,
-                    'Content-Type': 'text/html',
-                    'Set-Cookie': cookieHeader,
-                },
-                body: 'Setting cookies',
-            };
+            // There's a token in the query string. If it's not in the cookies yet we should set it not
+            if (!tokenCookie || !tokenCookie.includes('token=')) {
+                const cookieHeader = `token=${token}; Max-Age=36000; Path=/; HttpOnly`;
+    
+                console.log("Skipping to auth to set the right cookies")
+    
+                return {
+                    statusCode: 302,
+                    headers: {
+                        'Location': `/auth.html`,
+                        'Content-Type': 'text/html',
+                        'Set-Cookie': cookieHeader,
+                    },
+                    body: 'Setting cookies',
+                };
+            }
         }
 
         // Retrieve link information from Deta.Base
