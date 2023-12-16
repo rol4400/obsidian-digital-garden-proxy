@@ -207,7 +207,7 @@ exports.handler = async (req, context) => {
 
         // Return the error response with redirect to the custom error page
         return {
-            statusCode: 500,
+            statusCode: error.statusCode,
             headers: {
                 'Location': `/500.html`,
             },
@@ -291,7 +291,7 @@ function updateAssetUrls(htmlContent, token) {
 
         // Serialize the modified document back to HTML
         var updatedContent = $.html();
-        updatedContent.replace(/url\('([^']+)'\)/g, `url('$1?token=${token}')`);
+        // updatedContent.replace(/url\('([^']+)'\)/g, `url('$1?token=${token}')`);
 
         // Extract head and body sections
         const headBodyContent = extractHeadAndBody(updatedContent);
@@ -306,11 +306,10 @@ function updateAssetUrls(htmlContent, token) {
     }
 }
 
-
 function injectWarningAlert(htmlContent, expirationTime) {
 
     // Only add the warning alert if we are in a html document
-    if (htmlContent.includes("<html>")) {
+    if (htmlContent && htmlContent.includes("<body>")) {
         try {
             const $ = cheerio.load(htmlContent);
     
