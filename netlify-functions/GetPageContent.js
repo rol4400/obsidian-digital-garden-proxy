@@ -100,8 +100,8 @@ exports.handler = async (req, context) => {
         let response;
 
         // Extract the address path (anything after the domain)
-        const currentAddressPath = new URL(currentAddress).pathname;
-
+        const currentAddressPath = (new URL(currentAddress).pathname).replace(/^\/notes\//, '');
+        
         // Append the domain from the address in linkInfo.address
         const modifiedAddress = `${new URL(linkInfo.address).origin}${currentAddressPath}`;
 
