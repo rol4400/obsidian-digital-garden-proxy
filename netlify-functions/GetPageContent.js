@@ -163,7 +163,7 @@ exports.handler = async (req, context) => {
         const {
             head,
             body
-        } = updateAssetUrls(updatedHtml, linkInfo.address, "token");
+        } = updateAssetUrls(updatedHtml, token);
 
         // Return the modified response
         return {
@@ -214,33 +214,30 @@ function extractHeadAndBody(htmlContent) {
 }
 
 // Update the updateAssetUrls function
-function updateAssetUrls(htmlContent, originalAddress, token) {
+function updateAssetUrls(htmlContent, token) {
     try {
         const $ = cheerio.load(htmlContent);
-        // const originalDomain = originalAddress.split('/').slice(0, 3).join('/');
 
-        // Update URLs for style and script assets with the original domain
+        // Update URLs for style and script assets
         $('link[href], script[src]').each((index, element) => {
             const path = $(element).attr('href') || $(element).attr('src');
-            const resolvedUrl = "/notes" + path
-            $(element).attr('href', resolvedUrl);
-            $(element).attr('src', resolvedUrl);
+            if (path.startsWith('/')) {
+                $(element).attr('href', `/notes${path}`);
+                $(element).attr('src', `/notes${path}`);
+            }
         });
 
         // Update href links to append the token query parameter
         $('a[href^="/"]').each((index, element) => {
             const path = $(element).attr('href');
-            const resolvedUrl = "/notes" + path
-            resolvedUrl.searchParams.set('token', token);
-            $(element).attr('href', resolvedUrl.toString());
+            $(element).attr('href', `/notes${path}?token=${token}`);
         });
 
         // Update inline JavaScript fetch calls
         $('script').each((index, element) => {
             const scriptContent = $(element).html();
             if (scriptContent.includes('fetch')) {
-                const updatedScript = scriptContent.replace(/fetch\('\/graph.json'\)/g, `fetch('/notes/graph.json?token=${token}')`);
-                $(element).html(updatedScript);
+                $(element).html(scriptContent.replace(/fetch\('\/graph.json'\)/g, `fetch('/notes/graph.json?token=${token}')`));
             }
         });
 
@@ -259,6 +256,7 @@ function updateAssetUrls(htmlContent, originalAddress, token) {
         };
     }
 }
+
 
 function injectWarningAlert(htmlContent, expirationTime) {
     try {
