@@ -113,6 +113,7 @@ exports.handler = async (req, context) => {
 
         const isSameOrSubdirectory = (
             currentAddressPath === new URL(linkInfo.address).pathname ||
+            currentAddressPath === new URL(linkInfo.address).pathname + "/" ||
             currentAddressPath.startsWith(`${new URL(linkInfo.address).pathname}/`) ||
             currentAddressPath.startsWith('/script/') ||
             currentAddressPath.startsWith('/img/') ||
@@ -216,7 +217,8 @@ function extractHeadAndBody(htmlContent) {
 function updateAssetUrls(htmlContent, originalAddress, token) {
     try {
         const $ = cheerio.load(htmlContent);
-        const originalDomain = originalAddress.split('/').slice(0, 3).join('/');
+        // const originalDomain = originalAddress.split('/').slice(0, 3).join('/');
+        const originalDomain = "/notes"
 
         // Update URLs for style and script assets with the original domain
         $('link[href], script[src]').each((index, element) => {
