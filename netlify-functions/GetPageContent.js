@@ -107,6 +107,10 @@ exports.handler = async (req, context) => {
 
         // Check if the current address is the same as that in linkInfo.address,
         // is a subdirectory of linkInfo.address, or is within the /script, /img, /styles directories
+        console.log(currentAddressPath)
+        console.log(new URL(linkInfo.address).pathname)
+        console.log(`${new URL(linkInfo.address).pathname}/`)
+
         const isSameOrSubdirectory = (
             currentAddressPath === new URL(linkInfo.address).pathname ||
             currentAddressPath.startsWith(`${new URL(linkInfo.address).pathname}/`) ||
@@ -137,7 +141,7 @@ exports.handler = async (req, context) => {
             }
         } else {
             // Return error 403
-            console.log('Access forbidden (403)');
+            console.log('You are not authorised to access this page');
             return {
                     statusCode: 302,
                     headers: {
