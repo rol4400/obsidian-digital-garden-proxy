@@ -262,7 +262,8 @@ function updateAssetUrls(htmlContent, token) {
         // });
 
         // Serialize the modified document back to HTML
-        const updatedContent = $.html();
+        var updatedContent = $.html();
+        updatedContent.replace(/url\('([^']+)'\)/g, `url('$1?token=${token}')`);
 
         // Extract head and body sections
         const headBodyContent = extractHeadAndBody(updatedContent);
