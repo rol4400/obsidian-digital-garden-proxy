@@ -100,7 +100,7 @@ exports.handler = async (req, context) => {
         let response;
 
         // Extract the address path (anything after the domain)
-        const currentAddressPath = "/" + currentAddress.replace(/^\/notes\//, '');
+        const currentAddressPath = "/" + currentAddress;//.replace(/^\/notes\//, '');
         
         // Append the domain from the address in linkInfo.address
         const modifiedAddress = `${new URL(linkInfo.address).origin}${currentAddressPath}`;
@@ -219,27 +219,27 @@ function updateAssetUrls(htmlContent, token) {
         const $ = cheerio.load(htmlContent);
 
         // Update URLs for style and script assets
-        $('link[href], script[src]').each((index, element) => {
-            const path = $(element).attr('href') || $(element).attr('src');
-            if (path.startsWith('/')) {
-                $(element).attr('href', `/notes${path}`);
-                $(element).attr('src', `/notes${path}`);
-            }
-        });
+        // $('link[href], script[src]').each((index, element) => {
+        //     const path = $(element).attr('href') || $(element).attr('src');
+        //     if (path.startsWith('/')) {
+        //         $(element).attr('href', `/notes${path}`);
+        //         $(element).attr('src', `/notes${path}`);
+        //     }
+        // });
 
-        // Update href links to append the token query parameter
-        $('a[href^="/"]').each((index, element) => {
-            const path = $(element).attr('href');
-            $(element).attr('href', `/notes${path}?token=${token}`);
-        });
+        // // Update href links to append the token query parameter
+        // $('a[href^="/"]').each((index, element) => {
+        //     const path = $(element).attr('href');
+        //     $(element).attr('href', `/notes${path}?token=${token}`);
+        // });
 
-        // Update inline JavaScript fetch calls
-        $('script').each((index, element) => {
-            const scriptContent = $(element).html();
-            if (scriptContent.includes('fetch')) {
-                $(element).html(scriptContent.replace(/fetch\('\/graph.json'\)/g, `fetch('/notes/graph.json?token=${token}')`));
-            }
-        });
+        // // Update inline JavaScript fetch calls
+        // $('script').each((index, element) => {
+        //     const scriptContent = $(element).html();
+        //     if (scriptContent.includes('fetch')) {
+        //         $(element).html(scriptContent.replace(/fetch\('\/graph.json'\)/g, `fetch('/notes/graph.json?token=${token}')`));
+        //     }
+        // });
 
         // Serialize the modified document back to HTML
         const updatedContent = $.html();
