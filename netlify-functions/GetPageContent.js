@@ -93,7 +93,26 @@ exports.handler = async (req, context) => {
         }
 
         // Make an API call to get the page content
-        const response = await axios.get(linkInfo.address);
+        let response;
+        try {
+            response = await axios.get(linkInfo.address);
+        } catch (axiosError) {
+
+            // Handle 404 error by retrying with a modified URL
+            if (axiosError.response && axiosError.response.status === 404) {
+                console.log('Retrying with modified URL due to 404 error');
+        
+                // Append the last segment of the original address to itself (file with the same
+                // name as the directory can be used as an index)
+                const modifiedAddress = linkInfo.address.replace(/\/([^/]+)$/, '/$1/$1');
+        
+                // Retry the request with the modified URL
+                response = await axios.get(modifiedAddress);
+            } else {
+                // Re-throw the error if it's not a 404
+                throw axiosError;
+            }
+        }
 
         // Inject the warning alert if there is an expiration time
         var updatedHtml = response.data;
@@ -118,20 +137,13 @@ exports.handler = async (req, context) => {
     } catch (error) {
         console.error('Error:', error);
 
-        // Customize error response based on the error type
-        let statusCode = 500;
-
-        if (error.response && error.response.status) {
-            statusCode = error.response.status;
-        }
-
         // Return the error response with redirect to the custom error page
         return {
             statusCode: 500,
             headers: {
-                'Location': `${statusCode}.html`,
+                'Location': `500.html`,
             },
-            body: '',
+            body: 'Internal server error',
         };
     }
 };
