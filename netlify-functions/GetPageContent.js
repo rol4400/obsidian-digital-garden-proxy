@@ -93,26 +93,60 @@ exports.handler = async (req, context) => {
         }
 
         // Make an API call to get the page content
-        let response;
-        try {
-            response = await axios.get(linkInfo.address);
-        } catch (axiosError) {
+       // Extract the current address from the request
+        const currentAddress = req.headers.referer || req.headers.origin;
 
-            // Handle 404 error by retrying with a modified URL
-            if (axiosError.response && axiosError.response.status === 404) {
-                console.log('Retrying with modified URL due to 404 error');
-        
-                // Append the last segment of the original address to itself (file with the same
-                // name as the directory can be used as an index)
-                const modifiedAddress = linkInfo.address.replace(/\/([^/]+)$/, '/$1/$1');
-        
-                // Retry the request with the modified URL
+        // Make an API call to get the page content
+        let response;
+
+        // Extract the address path (anything after the domain)
+        const currentAddressPath = new URL(currentAddress).pathname;
+
+        // Append the domain from the address in linkInfo.address
+        const modifiedAddress = `${new URL(linkInfo.address).origin}${currentAddressPath}`;
+
+        // Check if the current address is the same as that in linkInfo.address,
+        // is a subdirectory of linkInfo.address, or is within the /script, /img, /styles directories
+        const isSameOrSubdirectory = (
+            currentAddressPath === new URL(linkInfo.address).pathname ||
+            currentAddressPath.startsWith(`${new URL(linkInfo.address).pathname}/`) ||
+            currentAddressPath.startsWith('/script/') ||
+            currentAddressPath.startsWith('/img/') ||
+            currentAddressPath.startsWith('/styles/')
+        );
+
+        if (isSameOrSubdirectory) {
+            // Try axios.get
+            try {
                 response = await axios.get(modifiedAddress);
-            } else {
-                // Re-throw the error if it's not a 404
-                throw axiosError;
+            } catch (axiosError) {
+                // Handle 404 error by retrying with a modified URL
+                if (axiosError.response && axiosError.response.status === 404) {
+                    console.log('Retrying with modified URL due to 404 error');
+
+                    // Append the last segment of the original address to itself
+                    const lastSegment = currentAddress.match(/\/([^/]+)$/);
+                    const modifiedSubdirectoryAddress = lastSegment ? `${new URL(linkInfo.address).origin}${currentAddressPath}/${lastSegment[1]}` : modifiedAddress;
+
+                    // Retry the request with the modified URL
+                    response = await axios.get(modifiedSubdirectoryAddress);
+                } else {
+                    // Re-throw the error if it's not a 404
+                    throw axiosError;
+                }
             }
+        } else {
+            // Return error 403
+            console.log('Access forbidden (403)');
+            return {
+                    statusCode: 302,
+                    headers: {
+                        'Location': `403.html`,
+                    },
+                    body: 'You are not authorised to access this page',
+                };
         }
+
 
         // Inject the warning alert if there is an expiration time
         var updatedHtml = response.data;
@@ -139,7 +173,7 @@ exports.handler = async (req, context) => {
 
         // Return the error response with redirect to the custom error page
         return {
-            statusCode: 500,
+            statusCode: 302,
             headers: {
                 'Location': `500.html`,
             },
