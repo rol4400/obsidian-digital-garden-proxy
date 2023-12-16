@@ -220,8 +220,8 @@ function updateAssetUrls(htmlContent, token) {
         const $ = cheerio.load(htmlContent);
 
         // Update URLs for styles, scripts, and images
-        $('[href], [src]').each((index, element) => {
-            const attr = $(element).is('[href]') ? 'href' : 'src';
+        $('[href], [src], [srcset]').each((index, element) => {
+            const attr = $(element).is('[href]') ? 'href' : ($(element).is('[src]') ? 'src' : 'srcset');
             const path = $(element).attr(attr);
             if (path && path.startsWith('/')) {
                 const updatedUrl = `${path}?token=${token}`;
