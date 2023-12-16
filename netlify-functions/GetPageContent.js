@@ -18,6 +18,8 @@ exports.handler = async (req, context) => {
 
         // Check if the token exists
         if (!token) {
+            console.log("Token not set")
+
             return {
                 statusCode: 302,
                 headers: {
@@ -32,6 +34,7 @@ exports.handler = async (req, context) => {
 
         // Check if the link has expired
         if (linkInfo.expirationTime && Date.now() > linkInfo.expirationTime) {
+            console.log("Link expiration time")
             return {
                 statusCode: 302,
                 headers: {
@@ -76,6 +79,9 @@ exports.handler = async (req, context) => {
     
             // Check if the user is registered
             if (!linkInfo.telegramIds.includes(userData["id"])) {
+
+                console.log("An authenticated telegram ID is required to access this page")
+
                 return {
                     statusCode: 302,
                     headers: {
