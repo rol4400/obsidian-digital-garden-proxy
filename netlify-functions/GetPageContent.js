@@ -21,7 +21,7 @@ exports.handler = async (req, context) => {
             console.log("Token not set")
 
             return {
-                statusCode: 302,
+                statusCode: 403,
                 headers: {
                     'Location': `/403.html`,
                 },
@@ -36,7 +36,7 @@ exports.handler = async (req, context) => {
         if (linkInfo.expirationTime && Date.now() > linkInfo.expirationTime) {
             console.log("Link expiration time")
             return {
-                statusCode: 302,
+                statusCode: 403,
                 headers: {
                     'Location': `/403.html`,
                 },
@@ -83,7 +83,7 @@ exports.handler = async (req, context) => {
                 console.log("An authenticated telegram ID is required to access this page")
 
                 return {
-                    statusCode: 302,
+                    statusCode: 403,
                     headers: {
                         'Location': `/403.html`,
                     },
@@ -145,7 +145,7 @@ exports.handler = async (req, context) => {
             // Return error 403
             console.log('You are not authorised to access this page');
             return {
-                    statusCode: 302,
+                    statusCode: 403,
                     headers: {
                         'Location': `/403.html`,
                     },
@@ -179,7 +179,7 @@ exports.handler = async (req, context) => {
 
         // Return the error response with redirect to the custom error page
         return {
-            statusCode: 302,
+            statusCode: 500,
             headers: {
                 'Location': `/500.html`,
             },
