@@ -94,7 +94,7 @@ exports.handler = async (req, context) => {
 
         // Make an API call to get the page content
        // Extract the current address from the request
-        const currentAddress = req.headers.referer || req.headers.origin;
+        const currentAddress = req.path || req.headers.referer || req.headers.origin;
 
         // Make an API call to get the page content
         let response;
