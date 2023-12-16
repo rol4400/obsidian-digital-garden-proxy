@@ -23,7 +23,7 @@ exports.handler = async (req, context) => {
             return {
                 statusCode: 302,
                 headers: {
-                    'Location': `403.html`,
+                    'Location': `/403.html`,
                 },
                 body: '',
             };
@@ -38,7 +38,7 @@ exports.handler = async (req, context) => {
             return {
                 statusCode: 302,
                 headers: {
-                    'Location': `403.html`,
+                    'Location': `/403.html`,
                 },
                 body: '',
             };
@@ -68,7 +68,7 @@ exports.handler = async (req, context) => {
                 return {
                     statusCode: 302,
                     headers: {
-                        'Location': `auth.html`,
+                        'Location': `/auth.html`,
                     },
                     body: 'Failed Telegram authentication',
                 };
@@ -85,7 +85,7 @@ exports.handler = async (req, context) => {
                 return {
                     statusCode: 302,
                     headers: {
-                        'Location': `403.html`,
+                        'Location': `/403.html`,
                     },
                     body: 'Telegram ID is not authenticated to access this page',
                 };
@@ -141,7 +141,7 @@ exports.handler = async (req, context) => {
             return {
                     statusCode: 302,
                     headers: {
-                        'Location': `403.html`,
+                        'Location': `/403.html`,
                     },
                     body: 'You are not authorised to access this page',
                 };
@@ -175,7 +175,7 @@ exports.handler = async (req, context) => {
         return {
             statusCode: 302,
             headers: {
-                'Location': `500.html`,
+                'Location': `/500.html`,
             },
             body: 'Internal server error',
         };
