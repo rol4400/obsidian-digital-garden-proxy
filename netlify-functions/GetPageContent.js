@@ -14,18 +14,41 @@ const linksTable = deta.Base('Obsidian_Links');
 exports.handler = async (req, context) => {
     try {
 
-        const { token, hash, ...userData } = req.queryStringParameters;
+        // Extract the query string parameters
+        var { token, hash, ...userData } = req.queryStringParameters;
 
-        // Check if the token exists
+        // If we don't have a token in the query string, try get one from the existing cookies
         if (!token) {
-            console.log("Token not set")
+            // Check if the 'token' cookie is missing or has an empty value
+            const tokenCookie = req.headers.cookie;
+            if (!tokenCookie || !tokenCookie.includes('token=')) {
+                console.log("Token not set")
+    
+                return {
+                    statusCode: 403,
+                    headers: {
+                        'Location': `/403.html`,
+                        'Set-Cookie': 'token=; Max-Age=0; Path=/; HttpOnly', // Expire any existing cookie
+                    },
+                    body: '',
+                };
+            }
+            
+            // Retrieve token from cookie
+            token = tokenCookie.split(';').find(cookie => cookie.trim().startsWith('token=')).split('=')[1];
+        } else {
+            const cookieHeader = `token=${token}; Max-Age=36000; Path=/; HttpOnly`;
+
+            console.log("Skipping to auth to set the right cookies")
 
             return {
-                statusCode: 403,
+                statusCode: 302,
                 headers: {
-                    'Location': `/403.html`,
+                    'Location': `/auth.html`,
+                    'Content-Type': 'text/html',
+                    'Set-Cookie': cookieHeader,
                 },
-                body: '',
+                body: 'Setting cookies',
             };
         }
 
@@ -220,23 +243,23 @@ function updateAssetUrls(htmlContent, token) {
         const $ = cheerio.load(htmlContent);
 
         // Update URLs for styles, scripts, and images
-        $('[href], [src], [srcset]').each((index, element) => {
-            const attr = $(element).is('[href]') ? 'href' : ($(element).is('[src]') ? 'src' : 'srcset');
-            const path = $(element).attr(attr);
-            if (path && path.startsWith('/')) {
-                const updatedUrl = `${path}?token=${token}`;
-                $(element).attr(attr, updatedUrl);
-            }
-        });
+        // $('[href], [src], [srcset]').each((index, element) => {
+        //     const attr = $(element).is('[href]') ? 'href' : ($(element).is('[src]') ? 'src' : 'srcset');
+        //     const path = $(element).attr(attr);
+        //     if (path && path.startsWith('/')) {
+        //         const updatedUrl = `${path}?token=${token}`;
+        //         $(element).attr(attr, updatedUrl);
+        //     }
+        // });
 
-        // Update inline JavaScript fetch calls
-        $('script').each((index, element) => {
-            const scriptContent = $(element).html();
-            if (scriptContent.includes('fetch')) {
-                const updatedScript = scriptContent.replace(/fetch\('([^']+)'\)/g, `fetch('$1?token=${token}')`);
-                $(element).html(updatedScript);
-            }
-        });
+        // // Update inline JavaScript fetch calls
+        // $('script').each((index, element) => {
+        //     const scriptContent = $(element).html();
+        //     if (scriptContent.includes('fetch')) {
+        //         const updatedScript = scriptContent.replace(/fetch\('([^']+)'\)/g, `fetch('$1?token=${token}')`);
+        //         $(element).html(updatedScript);
+        //     }
+        // });
 
         // // Update URLs for style and script assets
         // $('link[href], script[src], img[src]').each((index, element) => {
