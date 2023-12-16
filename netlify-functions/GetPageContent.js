@@ -218,12 +218,11 @@ function updateAssetUrls(htmlContent, originalAddress, token) {
     try {
         const $ = cheerio.load(htmlContent);
         // const originalDomain = originalAddress.split('/').slice(0, 3).join('/');
-        const originalDomain = "/notes"
 
         // Update URLs for style and script assets with the original domain
         $('link[href], script[src]').each((index, element) => {
             const path = $(element).attr('href') || $(element).attr('src');
-            const resolvedUrl = new URL(path, originalDomain).toString();
+            const resolvedUrl = "/notes" + path
             $(element).attr('href', resolvedUrl);
             $(element).attr('src', resolvedUrl);
         });
@@ -231,7 +230,7 @@ function updateAssetUrls(htmlContent, originalAddress, token) {
         // Update href links to append the token query parameter
         $('a[href^="/"]').each((index, element) => {
             const path = $(element).attr('href');
-            const resolvedUrl = new URL(path, originalDomain);
+            const resolvedUrl = "/notes" + path
             resolvedUrl.searchParams.set('token', token);
             $(element).attr('href', resolvedUrl.toString());
         });
@@ -240,7 +239,7 @@ function updateAssetUrls(htmlContent, originalAddress, token) {
         $('script').each((index, element) => {
             const scriptContent = $(element).html();
             if (scriptContent.includes('fetch')) {
-                const updatedScript = scriptContent.replace(/fetch\('\/graph.json'\)/g, `fetch('${originalDomain}/graph.json?token=${token}')`);
+                const updatedScript = scriptContent.replace(/fetch\('\/graph.json'\)/g, `fetch('/notes/graph.json?token=${token}')`);
                 $(element).html(updatedScript);
             }
         });
