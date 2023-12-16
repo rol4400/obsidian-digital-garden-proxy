@@ -2,7 +2,7 @@
   functions = "netlify-functions"
 
 [[redirects]]
-  from = "/"
+  from = "/*"
   to = "/.netlify/functions/GetPageContent"
   status = 200
   force = true
