@@ -205,14 +205,14 @@ exports.handler = async (req, context) => {
 
         } else if (contentType.startsWith('image') || contentType.startsWith('video')) {
 
-            // Handle image or video content
+              // Handle image or video content
             return {
                 statusCode: response.status,
                 headers: {
                     'Content-Type': contentType,
                 },
-                isBase64Encoded: false,
-                body: response.data, // Use binary data directly without conversion
+                isBase64Encoded: true, // Set to true for binary data
+                body: response.data.toString('base64'), // Convert binary data to base64
             };
         } else if (contentType.startsWith('application/json')) {
 
