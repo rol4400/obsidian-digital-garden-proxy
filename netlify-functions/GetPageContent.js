@@ -48,7 +48,7 @@ exports.handler = async (req, context) => {
                 return {
                     statusCode: 302,
                     headers: {
-                        'Location': `/auth.html`,
+                        'Location': `/auth.html?referer=` + req.path,
                         'Content-Type': 'text/html',
                         'Set-Cookie': cookieHeader,
                     },
@@ -96,7 +96,7 @@ exports.handler = async (req, context) => {
                 return {
                     statusCode: 302,
                     headers: {
-                        'Location': `/auth.html`,
+                        'Location': `/auth.html?referer=` + req.path,
                     },
                     body: 'Failed Telegram authentication',
                 };
