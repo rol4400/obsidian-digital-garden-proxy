@@ -191,9 +191,9 @@ exports.handler = async (req, context) => {
             var htmlContent = response.data.toString('utf8');
             
             //Inject the time remaining alert
-            if (contentType.includes("html")) {
+            // if (contentType.includes("html")) {
                 htmlContent = injectWarningAlert(htmlContent, linkInfo.expirationTime);
-            }
+            // }
 
             return {
                 statusCode: response.status,
