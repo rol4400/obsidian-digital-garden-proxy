@@ -218,14 +218,17 @@ exports.handler = async (req, context) => {
 
             try {
                 const jsonContent = JSON.parse(response.data.toString('utf8'));
-                
+        
+                // Stringify the JSON content before setting it as the response body
+                const responseBody = JSON.stringify(jsonContent);
+
                 // Return the JSON response directly without stringifying it
                 return {
                     statusCode: response.status,
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: jsonContent,
+                    body: responseBody,
                 };
             } catch (jsonParseError) {
                 console.error('Error parsing JSON:', jsonParseError);
