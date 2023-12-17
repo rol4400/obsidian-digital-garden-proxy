@@ -382,7 +382,7 @@ function updateAssetUrls(htmlContent, token) {
 function injectWarningAlert(htmlContent, expirationTime) {
 
     // Only add the warning alert if we are in a html document
-    if (htmlContent && htmlContent.includes("<body>")) {
+    // if (htmlContent && htmlContent.includes("<body>")) {
         try {
             const $ = cheerio.load(htmlContent);
     
@@ -512,7 +512,7 @@ function injectWarningAlert(htmlContent, expirationTime) {
             console.error('Error in injectWarningAlert:', error);
             return htmlContent;
         }
-    } else {
-        return htmlContent;
-    }
+    // } else {
+    //     return htmlContent;
+    // }
 }
