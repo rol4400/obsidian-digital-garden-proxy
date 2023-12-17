@@ -12,14 +12,14 @@
   status = 200
 
 [[redirects]]
-  from = "/*"
+  from = "/403.html"
   to = "/403.html"
-  status = 403
+  status = 200
 
 [[redirects]]
-  from = "/*"
+  from = "/500.html"
   to = "/500.html"
-  status = 500
+  status = 200
 
 [[redirects]]
   from = "/*"
