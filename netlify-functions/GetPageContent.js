@@ -153,7 +153,8 @@ exports.handler = async (req, context) => {
         if (isSameOrSubdirectory) {
             // Try axios.get
             try {
-                response = await axios.get(modifiedAddress);
+                // response = await axios.get(modifiedAddress);
+                response = await axios.get(modifiedAddress, { responseType: 'arraybuffer' });
             } catch (axiosError) {
                 // Handle 404 error by retrying with a modified URL
                 if (axiosError.response && axiosError.response.status === 404) {
@@ -164,7 +165,7 @@ exports.handler = async (req, context) => {
                     const modifiedSubdirectoryAddress = lastSegment ? `${new URL(linkInfo.address).origin}${currentAddressPath}/${lastSegment[1]}` : modifiedAddress;
 
                     // Retry the request with the modified URL
-                    response = await axios.get(modifiedSubdirectoryAddress);
+                    response = await axios.get(modifiedSubdirectoryAddress, { responseType: 'arraybuffer' });
                 } else {
                     // Re-throw the error if it's not a 404
                     throw axiosError;
@@ -182,27 +183,93 @@ exports.handler = async (req, context) => {
                 };
         }
 
+        // Check the Content-Type header
+        const contentType = response.headers['content-type'];
+        if (contentType.startsWith('text')) {
 
-        // Inject the warning alert if there is an expiration time
-        var updatedHtml = response.data;
-        if (linkInfo.expirationTime) {
-            updatedHtml = injectWarningAlert(response.data, linkInfo.expirationTime);
+            // Handle text content (HTML)
+            const htmlContent = response.data.toString('utf8');
+            
+            // Use htmlContent in your HTML
+            const {
+                head,
+                body
+            } = extractHeadAndBody(htmlContent);
+            return {
+                statusCode: response.status,
+                headers: {
+                    'Content-Type': 'text/html',
+                },
+                body: `<html>${head}<body>${body}</body></html>`,
+            };
+
+        } else if (contentType.startsWith('image')) {
+
+            // Handle image content
+            return {
+                statusCode: response.status,
+                headers: {
+                    'Content-Type': contentType, // Adjust content type based on the actual image type
+                },
+                isBase64Encoded: false,
+                body: response.data.toString('binary'),
+            };
+        } else if (contentType.startsWith('application/json')) {
+
+            // Handle JSON content
+            const jsonContent = JSON.parse(response.data.toString('utf8'));
+            // Use jsonContent in your HTML or other processing
+            // For example, if jsonContent is an object with a key 'message':
+            return {
+                statusCode: response.status,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: jsonContent.message,
+                }),
+            };
+        } else if (contentType.startsWith('video')) {
+
+            return {
+                statusCode: response.status,
+                headers: {
+                    'Content-Type': contentType, // Adjust content type based on the actual video type
+                },
+                isBase64Encoded: false,
+                body: response.data.toString('binary'),
+            };
+        } else {
+            // Handle other content types as needed
+            // ... (existing code for other content types)
+            return {
+                statusCode: 415,
+                headers: {
+                },
+                body: 'Content type not supported',
+            };
         }
 
-        // Update links and extract head and body sections
-        const {
-            head,
-            body
-        } = updateAssetUrls(updatedHtml, token);
+        // Inject the warning alert if there is an expiration time
+        // var updatedHtml = response.data;
+        // if (linkInfo.expirationTime) {
+        //     updatedHtml = injectWarningAlert(response.data, linkInfo.expirationTime);
+        // }
 
-        // Return the modified response
-        return {
-            statusCode: response.status,
-            headers: {
-                'Content-Type': 'text/html',
-            },
-            body: `<html>${head}<body>${body}</body></html>`,
-        };
+        // // Update links and extract head and body sections
+        // const {
+        //     head,
+        //     body
+        // } = updateAssetUrls(updatedHtml, token);
+
+        // // Return the modified response
+        // return {
+        //     statusCode: response.status,
+        //     headers: {
+        //         'Content-Type': 'text/html',
+        //     },
+        //     body: `<html>${head}<body>${body}</body></html>`,
+        // };
     } catch (error) {
         console.error('Error:', error);
 
