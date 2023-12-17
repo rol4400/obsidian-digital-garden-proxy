@@ -198,9 +198,9 @@ exports.handler = async (req, context) => {
             return {
                 statusCode: response.status,
                 headers: {
-                    'Content-Type': 'text/html',
+                    'Content-Type': contentType,
                     'Access-Control-Allow-Origin': '*', // Adjust the origin as needed for CORS
-                    'Content-Security-Policy': "default-src 'self' 'unsafe-inline' 'unsafe-eval';", // Adjust CSP as needed       
+                    // 'Content-Security-Policy': "default-src 'self' 'unsafe-inline' 'unsafe-eval';", // Adjust CSP as needed       
                 },
                 body: `<html>${head}<body>${body}</body></html>`,
             };
@@ -229,7 +229,7 @@ exports.handler = async (req, context) => {
                 return {
                     statusCode: response.status,
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': contentType,
                         'Access-Control-Allow-Origin': '*', // Adjust the origin as needed for CORS
                     },
                     body: responseBody,
