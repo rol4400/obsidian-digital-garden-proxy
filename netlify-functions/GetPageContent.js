@@ -216,14 +216,27 @@ exports.handler = async (req, context) => {
             };
         } else if (contentType.startsWith('application/json')) {
 
-            // Handle JSON content
-            return {
-                statusCode: response.status,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: response.data,
-            };
+            try {
+                const jsonContent = JSON.parse(response.data.toString('utf8'));
+                
+                // Return the JSON response directly without stringifying it
+                return {
+                    statusCode: response.status,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: jsonContent,
+                };
+            } catch (jsonParseError) {
+                console.error('Error parsing JSON:', jsonParseError);
+                return {
+                    statusCode: 500, // Internal Server Error
+                    headers: {},
+                    body: JSON.stringify({
+                        error: 'Error parsing JSON response',
+                    }),
+                };
+            }
         } else {
             // Handle other content types as needed
             // ... (existing code for other content types)
