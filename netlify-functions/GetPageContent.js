@@ -199,6 +199,8 @@ exports.handler = async (req, context) => {
                 statusCode: response.status,
                 headers: {
                     'Content-Type': 'text/html',
+                    'Access-Control-Allow-Origin': '*', // Adjust the origin as needed for CORS
+                    'Content-Security-Policy': "default-src 'self' 'unsafe-inline' 'unsafe-eval';", // Adjust CSP as needed       
                 },
                 body: `<html>${head}<body>${body}</body></html>`,
             };
@@ -210,6 +212,7 @@ exports.handler = async (req, context) => {
                 statusCode: response.status,
                 headers: {
                     'Content-Type': contentType,
+                    'Access-Control-Allow-Origin': '*', // Adjust the origin as needed for CORS
                 },
                 isBase64Encoded: true, // Set to true for binary data
                 body: response.data.toString('base64'), // Convert binary data to base64
@@ -227,6 +230,7 @@ exports.handler = async (req, context) => {
                     statusCode: response.status,
                     headers: {
                         'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*', // Adjust the origin as needed for CORS
                     },
                     body: responseBody,
                 };
