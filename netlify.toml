@@ -22,6 +22,12 @@
   status = 200
 
 [[redirects]]
+  from = "/save-auth"
+  to = "/.netlify/functions/TelegramAuth"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/.netlify/functions/GetPageContent"
   status = 200

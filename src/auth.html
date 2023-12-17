@@ -303,7 +303,7 @@
             script.setAttribute('data-telegram-login', 'ryans_notes_authenticator_bot');
             script.setAttribute('data-size', 'large');
             script.setAttribute('data-radius', '10');
-            script.setAttribute('data-auth-url', `${getQueryParam('referer')}`);
+            script.setAttribute('data-auth-url', `/save-auth?referer=${getQueryParam('referer')}`);
 
             container.appendChild(script);
         }
