@@ -202,7 +202,7 @@ exports.handler = async (req, context) => {
                     'Access-Control-Allow-Origin': '*', // Adjust the origin as needed for CORS
                     // 'Content-Security-Policy': "default-src 'self' 'unsafe-inline' 'unsafe-eval';", // Adjust CSP as needed       
                 },
-                body: `<html>${head}<body>${body}</body></html>`,
+                body: htmlContent, //`<html>${head}<body>${body}</body></html>`,
             };
 
         } else if (contentType.startsWith('image') || contentType.startsWith('video')) {
