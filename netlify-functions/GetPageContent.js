@@ -74,48 +74,57 @@ exports.handler = async (req, context) => {
 
         if (linkInfo.telegramIds) {
 
-            // Extract key for telegram ID
-            const botToken = process.env.TELE_BOT_TOKEN; // Replace with your actual Telegram bot token
-            const secretKey =  crypto.createHash('sha256')
-                .update(botToken)
-                .digest();
+           // Extract key for telegram ID
+            const botToken = process.env.TELE_BOT_TOKEN;
+            const secretKey = crypto.createHash('sha256').update(botToken).digest();
+
+            // Check if stel_token and stel_ssid cookies are present
+            if (cookies && cookies.includes('stel_token=') && cookies.includes('stel_ssid=')) {
+                // Extract stel_token and stel_ssid from cookies
+                const stelToken = cookies.split(';').find(cookie => cookie.trim().startsWith('stel_token=')).split('=')[1];
+                const stelSsid = cookies.split(';').find(cookie => cookie.trim().startsWith('stel_ssid=')).split('=')[1];
+
+                // Construct the data to be authenticated
+                const dataCheckString = `${stelToken}\n${stelSsid}`;
+
+                // Run a cryptographic hash function over the data to be authenticated and the secret
+                const hmac = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
+
     
-            // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
-            const dataCheckString = Object.keys(userData)
-                .sort()
-                .map(key => (`${key}=${userData[key]}`))
-                .join('\n');
+                // Invalid login hash
+                if (hmac !== hash) {
+                    return {
+                        statusCode: 302,
+                        headers: {
+                            'Location': `/auth.html?referer=` + req.path,
+                        },
+                        body: 'Failed Telegram authentication',
+                    };
+                }
     
-            // run a cryptographic hash function over the data to be authenticated and the secret
-            const hmac =  crypto.createHmac('sha256', secretKey)
-                .update(dataCheckString)
-                .digest('hex');
-    
-            // Invalid login hash
-            if (hmac !== hash) {
+                console.log(linkInfo.telegramIds);
+                console.log(userData["id"]);
+        
+                // Check if the user is registered
+                if (!linkInfo.telegramIds.includes(userData["id"])) {
+
+                    console.log("An authenticated telegram ID is required to access this page")
+
+                    return {
+                        statusCode: 403,
+                        headers: {
+                            'Location': `/403.html`,
+                        },
+                        body: 'Telegram ID is not authenticated to access this page',
+                    };
+                }
+            } else {
                 return {
                     statusCode: 302,
                     headers: {
                         'Location': `/auth.html?referer=` + req.path,
                     },
                     body: 'Failed Telegram authentication',
-                };
-            }
-    
-            console.log(linkInfo.telegramIds);
-            console.log(userData["id"]);
-    
-            // Check if the user is registered
-            if (!linkInfo.telegramIds.includes(userData["id"])) {
-
-                console.log("An authenticated telegram ID is required to access this page")
-
-                return {
-                    statusCode: 403,
-                    headers: {
-                        'Location': `/403.html`,
-                    },
-                    body: 'Telegram ID is not authenticated to access this page',
                 };
             }
         }
