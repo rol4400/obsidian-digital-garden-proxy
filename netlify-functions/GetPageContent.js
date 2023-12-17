@@ -191,7 +191,7 @@ exports.handler = async (req, context) => {
             var htmlContent = response.data.toString('utf8');
             
             //Inject the time remaining alert
-            if (contentType == "application/html") {
+            if (contentType == "text/html") {
                 htmlContent = injectWarningAlert(htmlContent, linkInfo.expirationTime);
             }
 
@@ -382,7 +382,7 @@ function updateAssetUrls(htmlContent, token) {
 function injectWarningAlert(htmlContent, expirationTime) {
 
     // Only add the warning alert if we are in a html document
-    if (false && htmlContent && htmlContent.includes("<body>")) {
+    if (htmlContent && htmlContent.includes("<body>")) {
         try {
             const $ = cheerio.load(htmlContent);
     
