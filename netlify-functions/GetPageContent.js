@@ -203,16 +203,16 @@ exports.handler = async (req, context) => {
                 body: `<html>${head}<body>${body}</body></html>`,
             };
 
-        } else if (contentType.startsWith('image')) {
+        } else if (contentType.startsWith('image') || contentType.startsWith('video')) {
 
-            // Handle image content
+            // Handle image or video content
             return {
                 statusCode: response.status,
                 headers: {
-                    'Content-Type': contentType, // Adjust content type based on the actual image type
+                    'Content-Type': contentType,
                 },
                 isBase64Encoded: false,
-                body: response.data.toString('binary'),
+                body: response.data, // Use binary data directly without conversion
             };
         } else if (contentType.startsWith('application/json')) {
 
@@ -228,16 +228,6 @@ exports.handler = async (req, context) => {
                 body: JSON.stringify({
                     message: jsonContent.message,
                 }),
-            };
-        } else if (contentType.startsWith('video')) {
-
-            return {
-                statusCode: response.status,
-                headers: {
-                    'Content-Type': contentType, // Adjust content type based on the actual video type
-                },
-                isBase64Encoded: false,
-                body: response.data.toString('binary'),
             };
         } else {
             // Handle other content types as needed
