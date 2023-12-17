@@ -217,17 +217,12 @@ exports.handler = async (req, context) => {
         } else if (contentType.startsWith('application/json')) {
 
             // Handle JSON content
-            const jsonContent = JSON.parse(response.data.toString('utf8'));
-            // Use jsonContent in your HTML or other processing
-            // For example, if jsonContent is an object with a key 'message':
             return {
                 statusCode: response.status,
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    message: jsonContent.message,
-                }),
+                body: response.data,
             };
         } else {
             // Handle other content types as needed
