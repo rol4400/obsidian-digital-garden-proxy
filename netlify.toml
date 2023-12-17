@@ -7,6 +7,11 @@
   status = 200
 
 [[redirects]]
+  from = "/token.html"
+  to = "/token.html"
+  status = 200
+
+[[redirects]]
   from = "/403.html"
   to = "/403.html"
   status = 200

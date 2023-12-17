@@ -48,7 +48,7 @@ exports.handler = async (req, context) => {
                 return {
                     statusCode: 302,
                     headers: {
-                        'Location': `/auth.html?referer=` + req.path,
+                        'Location': `/token.html?referer=` + req.path,
                         'Content-Type': 'text/html',
                         'Set-Cookie': cookieHeader,
                     },
@@ -188,13 +188,13 @@ exports.handler = async (req, context) => {
         if (contentType.startsWith('text')) {
 
             // Handle text content (HTML)
-            const htmlContent = response.data.toString('utf8');
+            var htmlContent = response.data.toString('utf8');
             
-            // Use htmlContent in your HTML
-            const {
-                head,
-                body
-            } = extractHeadAndBody(htmlContent);
+            //Inject the time remaining alert
+            if (contentType == "application/html") {
+                htmlContent = injectWarningAlert(htmlContent, linkInfo.expirationTime);
+            }
+
             return {
                 statusCode: response.status,
                 headers: {
