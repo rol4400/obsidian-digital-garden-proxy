@@ -143,6 +143,7 @@ exports.handler = async (req, context) => {
             currentAddressPath === new URL(linkInfo.address).pathname ||
             currentAddressPath === new URL(linkInfo.address).pathname + "/" ||
             currentAddressPath === "/graph.json" ||
+            currentAddressPath === "/favicon.ico" ||
             currentAddressPath.startsWith(`${new URL(linkInfo.address).pathname}/`) ||
             currentAddressPath.startsWith('/script/') ||
             currentAddressPath.startsWith('/img/') ||
@@ -309,7 +310,7 @@ function updateAssetUrls(htmlContent, token) {
 function injectWarningAlert(htmlContent, expirationTime) {
 
     // Only add the warning alert if we are in a html document
-    if (htmlContent && htmlContent.includes("<body>")) {
+    if (false && htmlContent && htmlContent.includes("<body>")) {
         try {
             const $ = cheerio.load(htmlContent);
     
