@@ -255,26 +255,6 @@ exports.handler = async (req, context) => {
             };
         }
 
-        // Inject the warning alert if there is an expiration time
-        // var updatedHtml = response.data;
-        // if (linkInfo.expirationTime) {
-        //     updatedHtml = injectWarningAlert(response.data, linkInfo.expirationTime);
-        // }
-
-        // // Update links and extract head and body sections
-        // const {
-        //     head,
-        //     body
-        // } = updateAssetUrls(updatedHtml, token);
-
-        // // Return the modified response
-        // return {
-        //     statusCode: response.status,
-        //     headers: {
-        //         'Content-Type': 'text/html',
-        //     },
-        //     body: `<html>${head}<body>${body}</body></html>`,
-        // };
     } catch (error) {
         console.error('Error:', error);
 
@@ -288,32 +268,6 @@ exports.handler = async (req, context) => {
         };
     }
 };
-
-// Update the extractHeadAndBody function in getPageContent.js
-function extractHeadAndBody(htmlContent) {
-    // Find the first occurrence of <head> and <body>
-    const headStartIndex = htmlContent.indexOf('<head>');
-    const headEndIndex = htmlContent.indexOf('</head>');
-    const bodyStartIndex = htmlContent.indexOf('<body>');
-    const bodyEndIndex = htmlContent.indexOf('</body>');
-
-    // If <head> and <body> are found, extract the content
-    if (headStartIndex !== -1 && headEndIndex !== -1 && bodyStartIndex !== -1 && bodyEndIndex !== -1) {
-        const head = htmlContent.substring(headStartIndex, headEndIndex + '</head>'.length);
-        const body = htmlContent.substring(bodyStartIndex + '<body>'.length, bodyEndIndex);
-
-        return {
-            head,
-            body
-        };
-    }
-
-    // If not found, return the original content
-    return {
-        head: '',
-        body: htmlContent
-    };
-}
 
 function injectWarningAlert(htmlContent, expirationTime) {
 
