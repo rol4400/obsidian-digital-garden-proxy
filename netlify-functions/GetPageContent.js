@@ -97,7 +97,7 @@ exports.handler = async (req, context) => {
             const userData = (sessionCookies.split(';').find(cookie => cookie.trim().startsWith('userData=')).split(/=(.*)/s)[1]).split('&');
 
             // Remove the hash & decode URI elements
-            const userDataWithoutHash = decodeURIComponent(userData.filter(entry => !entry.startsWith('hash=')).toString());
+            const userDataWithoutHash = userData.filter(entry => !entry.startsWith('hash='));
             const hash = (userData.filter(entry => entry.startsWith('hash='))).toString().split("=")[1];
 
             // // Sort and format the data-check-string
@@ -122,6 +122,7 @@ exports.handler = async (req, context) => {
             // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
             const dataCheckString = userDataWithoutHash
                 .sort()
+                .filter(value => decodeURIComponent(value))
                 // .map(key => (`${key}=${userData[key]}`))
                 .join('\n');
 
