@@ -115,7 +115,7 @@ exports.handler = async (req, context) => {
                 return {
                     statusCode: 302,
                     headers: {
-                        'Location': `/auth.html?referer=` + req.path + `reason=failed-auth`,
+                        'Location': `/auth.html?referer=` + req.path + `&reason=failed-auth`,
                     },
                     body: 'Failed Telegram authentication',
                 };
