@@ -100,8 +100,8 @@ exports.handler = async (req, context) => {
             // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
             const dataCheckString = Object.keys(userData)
                 .sort()
-                .map(key => (`${key}=${userData[key]}`))
                 .join('\n');
+                // .map(key => (`${key}=${userData[key]}`))
 
             console.log(userData);
             console.log(dataCheckString);
