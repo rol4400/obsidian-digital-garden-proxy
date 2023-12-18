@@ -129,9 +129,9 @@ exports.handler = async (req, context) => {
             console.log(dataCheckString);
     
             // run a cryptographic hash function over the data to be authenticated and the secret
-            // const hmac =  crypto.createHmac('sha256', secretKey)
-            //     .update(dataCheckString)
-            //     .digest('hex');
+            const hmac =  crypto.createHmac('sha256', secretKey)
+                .update(dataCheckString)
+                .digest('hex');
     
             // Invalid login hash
             if (hmac !== hash) {
