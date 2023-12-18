@@ -95,13 +95,13 @@ exports.handler = async (req, context) => {
                 .digest();
     
             // Extract 'userData' from cookies
-            const userData = tokenCookie.split(';').find(cookie => cookie.trim().startsWith('userData=')).split('=')[1];
+            const dataCheckString = tokenCookie.split(';').find(cookie => cookie.trim().startsWith('userData=')).split('=')[1];
 
             // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
-            const dataCheckString = Object.keys(userData)
-                .sort()
-                .map(key => (`${key}=${userData[key]}`))
-                .join('\n');
+            // const dataCheckString = Object.keys(userData)
+            //     .sort()
+            //     .map(key => (`${key}=${userData[key]}`))
+            //     .join('\n');
 
             console.log(dataCheckString);
     
