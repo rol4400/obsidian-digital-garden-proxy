@@ -97,7 +97,7 @@ exports.handler = async (req, context) => {
             const userData = (sessionCookies.split(';').find(cookie => cookie.trim().startsWith('userData=')).split(/=(.*)/s)[1]).split('&');
 
             // Remove the hash & decode URI elements
-            const userDataWithoutHash = decodeURI(userData.filter(entry => !entry.startsWith('hash=')));
+            const userDataWithoutHash = decodeURI(userData.filter(entry => !entry.startsWith('hash=')).toString());
             const hash = (userData.filter(entry => entry.startsWith('hash='))).toString().split("=")[1];
 
             // // Sort and format the data-check-string
