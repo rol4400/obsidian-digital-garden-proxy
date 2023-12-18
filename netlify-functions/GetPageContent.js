@@ -43,7 +43,9 @@ exports.handler = async (req, context) => {
             // There's a token in the query string. If it's not in the cookies yet (or is an old cookie) we should set it
             var tokenOld;
             if (sessionCookies) {
-                tokenOld = sessionCookies.split(';').find(cookie => cookie.trim().startsWith('token=')).split('=')[1];
+                try {
+                    tokenOld = sessionCookies.split(';').find(cookie => cookie.trim().startsWith('token=')).split('=')[1];
+                } catch (e) {}
             }
             if (!sessionCookies || !sessionCookies.includes('token=') || tokenOld != token) {
                 const cookieHeader = `token=${token}; Max-Age=36000; Path=/; HttpOnly`;
