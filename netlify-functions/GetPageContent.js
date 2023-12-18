@@ -42,7 +42,7 @@ exports.handler = async (req, context) => {
 
             // There's a token in the query string. If it's not in the cookies yet (or is an old cookie) we should set it
 
-            var tokenOld = sessionCookies.split(';').find(cookie => cookie.trim().startsWith('token=')).split('=')[1];
+            var tokenOld = sessionCookies && sessionCookies.split(';').find(cookie => cookie.trim().startsWith('token=')).split('=')[1];
             if (!sessionCookies || !sessionCookies.includes('token=') || tokenOld != token) {
                 const cookieHeader = `token=${token}; Max-Age=36000; Path=/; HttpOnly`;
     
@@ -100,57 +100,23 @@ exports.handler = async (req, context) => {
             const userDataWithoutHash = userData.filter(entry => !entry.startsWith('hash='));
             const hash = (userData.filter(entry => entry.startsWith('hash='))).toString().split("=")[1];
 
-            // // Sort and format the data-check-string
-            // const dataCheckString = userDataWithoutHash
-            //     .sort()
-            //     .map(entry => entry.replace('=', '='))
-            //     .join('\n');
-
-            // // Calculate HMAC-SHA-256
-            // const hmac = crypto.createHmac('sha256', secretKey).update(dataCheckString, 'utf-8').digest('hex');
-
+            // Generate the secret key from the botToken
             const secretKey =  crypto.createHash('sha256')
                 .update(botToken)
                 .digest();
-    
-            // Extract 'userData' from cookies
-            // const userData = (sessionCookies.split(';').find(cookie => cookie.trim().startsWith('userData=')).split(/=(.*)/s)[1]).split('&');
 
-            // Remove the hash
-            // const userDataWithoutHash = userData.filter(entry => !entry.startsWith('hash='));
-
-            // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
+            //This is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
             const dataCheckString = decodeURIComponent(userDataWithoutHash
                 .sort()
-                // .map(key => (`${key}=${userData[key]}`))
                 .join('\n'));
 
-            const dataCheckString2 = await Object.keys(userData2)
-                .sort()
-                .map(key => (`${key}=${userData2[key]}`))
-                .join('\n');
-
-            console.log("Data1: " + userData);
-            console.log("Data2: " + userData2);
-            console.log("DateCheckString: " + dataCheckString);
-    
-            // run a cryptographic hash function over the data to be authenticated and the secret
+            // Run a cryptographic hash function over the data to be authenticated and the secret
             const hmac =  crypto.createHmac('sha256', secretKey)
                 .update(dataCheckString)
-                .digest('hex');
-
-            const hmac2 =  crypto.createHmac('sha256', secretKey)
-                .update(dataCheckString2)
                 .digest('hex');
     
             // Invalid login hash
             if (hmac !== hash) {
-
-                console.log("Hashes don't match")
-                console.log("Hash: " + hash)
-                console.log("Hmac: " + hmac)
-                console.log("Hmac2: " + hmac2)
-
                 return {
                     statusCode: 302,
                     headers: {
@@ -160,13 +126,10 @@ exports.handler = async (req, context) => {
                 };
             }
 
+            // Get the userId from the telegram auth cookies
             const userId = (userData.filter(entry => entry.startsWith('id='))).toString().split("=")[1];
-            
-    
-            console.log(linkInfo.telegramIds);
-            console.log(userId);
-    
-            // Check if the user is registered
+           
+            // Check if the user is registered to use this token
             if (!linkInfo.telegramIds.includes(userId)) {
 
                 console.log("An authenticated telegram ID is required to access this page")
