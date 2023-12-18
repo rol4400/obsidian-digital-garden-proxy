@@ -106,7 +106,7 @@ exports.handler = async (req, context) => {
                 .join('\n');
 
             // Calculate HMAC-SHA-256
-            const hmac = crypto.createHmac('sha256', secretKey).update(Buffer.from(dataCheckString, 'utf-8')).digest('hex');
+            const hmac = crypto.createHmac('sha256', secretKey).update(dataCheckString, 'utf-8').digest('hex');
 
             // const secretKey =  crypto.createHash('sha256')
             //     .update(botToken)
@@ -134,6 +134,11 @@ exports.handler = async (req, context) => {
     
             // Invalid login hash
             if (hmac !== hash) {
+
+                console.log("Hashes don't match")
+                console.log("Hash: " + hash)
+                console.log("Hmac: " + hmac)
+
                 return {
                     statusCode: 302,
                     headers: {
