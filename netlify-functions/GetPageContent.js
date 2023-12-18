@@ -7,7 +7,6 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const moment = require('moment');
 const crypto = require('crypto');
-const { data } = require('cheerio/lib/api/attributes');
 
 const deta = Deta(process.env.DETA_PROJECT_KEY);
 const linksTable = deta.Base('Obsidian_Links');
