@@ -98,7 +98,7 @@ exports.handler = async (req, context) => {
 
             // Remove the hash
             const userDataWithoutHash = userData.filter(entry => !entry.startsWith('hash='));
-            const hash = userData.filter(entry => entry.startsWith('hash='));
+            const hash = (userData.filter(entry => entry.startsWith('hash='))).toString().split("=")[1];
 
             // Sort and format the data-check-string
             const dataCheckString = userDataWithoutHash
