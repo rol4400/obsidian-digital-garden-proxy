@@ -15,7 +15,7 @@ exports.handler = async (req, context) => {
     try {
 
         // Extract the query string parameters and cookie tokens
-        var { token, hash } = req.queryStringParameters;
+        var { token } = req.queryStringParameters;
         const sessionCookies = req.headers.cookie;
 
         // If we don't have a token in the query string, try get one from the existing cookies
@@ -98,7 +98,7 @@ exports.handler = async (req, context) => {
 
             // Remove the hash
             const userDataWithoutHash = userData.filter(entry => !entry.startsWith('hash='));
-            hash = userData.filter(entry => entry.startsWith('hash=')).split("=")[1];
+            const hash = (userData.filter(entry => entry.startsWith('hash='))).split("=")[1];
 
             // Sort and format the data-check-string
             const dataCheckString = userDataWithoutHash
