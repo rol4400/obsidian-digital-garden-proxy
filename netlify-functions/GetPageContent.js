@@ -98,7 +98,7 @@ exports.handler = async (req, context) => {
             const userData = (sessionCookies.split(';').find(cookie => cookie.trim().startsWith('userData=')).split(/=(.*)/s)[1]).split('&');
 
             // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
-            const dataCheckString = Object.keys(userData)
+            const dataCheckString = userData
                 .sort()
                 .join('\n');
                 // .map(key => (`${key}=${userData[key]}`))
