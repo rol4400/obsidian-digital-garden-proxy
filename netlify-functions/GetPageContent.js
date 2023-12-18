@@ -96,8 +96,8 @@ exports.handler = async (req, context) => {
             // Extract 'userData' from cookies
             const userData = (sessionCookies.split(';').find(cookie => cookie.trim().startsWith('userData=')).split(/=(.*)/s)[1]).split('&');
 
-            // Remove the hash
-            const userDataWithoutHash = userData.filter(entry => !entry.startsWith('hash='));
+            // Remove the hash & decode URI elements
+            const userDataWithoutHash = decodeURI(userData.filter(entry => !entry.startsWith('hash=')));
             const hash = (userData.filter(entry => entry.startsWith('hash='))).toString().split("=")[1];
 
             // // Sort and format the data-check-string
@@ -120,23 +120,27 @@ exports.handler = async (req, context) => {
             // const userDataWithoutHash = userData.filter(entry => !entry.startsWith('hash='));
 
             // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
-            // const dataCheckString = 
-            //     .sort()
-            //     .map(key => (`${key}=${userData[key]}`))
-            //     .join('\n');
+            const dataCheckString = userDataWithoutHash
+                .sort()
+                // .map(key => (`${key}=${userData[key]}`))
+                .join('\n');
 
-            const dataCheckString = await Object.keys(userData2)
+            const dataCheckString2 = await Object.keys(userData2)
                 .sort()
                 .map(key => (`${key}=${userData[key]}`))
                 .join('\n');
 
-            console.log(userData);
-            console.log(userData2);
-            console.log(dataCheckString);
+            console.log("Data1: " + userData);
+            console.log("Data2: " + userData2);
+            console.log("DateCheckString: " + dataCheckString);
     
             // run a cryptographic hash function over the data to be authenticated and the secret
             const hmac =  crypto.createHmac('sha256', secretKey)
                 .update(dataCheckString)
+                .digest('hex');
+
+            const hmac2 =  crypto.createHmac('sha256', secretKey)
+                .update(dataCheckString2)
                 .digest('hex');
     
             // Invalid login hash
@@ -145,6 +149,7 @@ exports.handler = async (req, context) => {
                 console.log("Hashes don't match")
                 console.log("Hash: " + hash)
                 console.log("Hmac: " + hmac)
+                console.log("Hmac2: " + hmac2)
 
                 return {
                     statusCode: 302,
