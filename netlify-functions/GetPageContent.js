@@ -90,8 +90,8 @@ exports.handler = async (req, context) => {
 
             // Extract key for telegram ID
             const botToken = process.env.TELE_BOT_TOKEN; // Replace with your actual Telegram bot token
+            // const secretKey = crypto.createHash('sha256').update(botToken).digest();
 
-            const secretKey = crypto.createHash('sha256').update(botToken).digest();
 
             // Extract 'userData' from cookies
             const userData = (sessionCookies.split(';').find(cookie => cookie.trim().startsWith('userData=')).split(/=(.*)/s)[1]).split('&');
@@ -100,30 +100,30 @@ exports.handler = async (req, context) => {
             const userDataWithoutHash = userData.filter(entry => !entry.startsWith('hash='));
             const hash = (userData.filter(entry => entry.startsWith('hash='))).toString().split("=")[1];
 
-            // Sort and format the data-check-string
-            const dataCheckString = userDataWithoutHash
-                .sort()
-                .map(entry => entry.replace('=', '='))
-                .join('\n');
-
-            // Calculate HMAC-SHA-256
-            const hmac = crypto.createHmac('sha256', secretKey).update(dataCheckString, 'utf-8').digest('hex');
-
-            // const secretKey =  crypto.createHash('sha256')
-            //     .update(botToken)
-            //     .digest();
-    
-            // // Extract 'userData' from cookies
-            // const userData = (sessionCookies.split(';').find(cookie => cookie.trim().startsWith('userData=')).split(/=(.*)/s)[1]).split('&');
-
-            // // Remove the hash
-            // const userDataWithoutHash = userData.filter(entry => !entry.startsWith('hash='));
-
-            // // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
+            // // Sort and format the data-check-string
             // const dataCheckString = userDataWithoutHash
             //     .sort()
-            //     .map(key => (`${key}=${userData[key]}`))
+            //     .map(entry => entry.replace('=', '='))
             //     .join('\n');
+
+            // // Calculate HMAC-SHA-256
+            // const hmac = crypto.createHmac('sha256', secretKey).update(dataCheckString, 'utf-8').digest('hex');
+
+            const secretKey =  crypto.createHash('sha256')
+                .update(botToken)
+                .digest();
+    
+            // Extract 'userData' from cookies
+            // const userData = (sessionCookies.split(';').find(cookie => cookie.trim().startsWith('userData=')).split(/=(.*)/s)[1]).split('&');
+
+            // Remove the hash
+            // const userDataWithoutHash = userData.filter(entry => !entry.startsWith('hash='));
+
+            // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
+            const dataCheckString = userDataWithoutHash
+                .sort()
+                // .map(key => (`${key}=${userData[key]}`))
+                .join('\n');
 
             console.log(userData);
             console.log(dataCheckString);
