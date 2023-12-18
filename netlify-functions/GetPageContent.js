@@ -7,6 +7,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const moment = require('moment');
 const crypto = require('crypto');
+const { data } = require('cheerio/lib/api/attributes');
 
 const deta = Deta(process.env.DETA_PROJECT_KEY);
 const linksTable = deta.Base('Obsidian_Links');
@@ -102,6 +103,8 @@ exports.handler = async (req, context) => {
                 .sort()
                 .map(key => (`${key}=${userData[key]}`))
                 .join('\n');
+
+            console.log(dataCheckString);
     
             // run a cryptographic hash function over the data to be authenticated and the secret
             const hmac =  crypto.createHmac('sha256', secretKey)
@@ -113,7 +116,7 @@ exports.handler = async (req, context) => {
                 return {
                     statusCode: 302,
                     headers: {
-                        'Location': `/auth.html?referer=` + req.path,
+                        'Location': `/auth.html?referer=` + req.path + `reason=failed-auth`,
                     },
                     body: 'Failed Telegram authentication',
                 };
