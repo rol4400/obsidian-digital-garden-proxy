@@ -15,7 +15,7 @@ exports.handler = async (req, context) => {
     try {
 
         // Extract the query string parameters and cookie tokens
-        var { token } = req.queryStringParameters;
+        var { token, hash, ...userData2 } = req.queryStringParameters;
         const sessionCookies = req.headers.cookie;
 
         // If we don't have a token in the query string, try get one from the existing cookies
@@ -125,7 +125,7 @@ exports.handler = async (req, context) => {
             //     .map(key => (`${key}=${userData[key]}`))
             //     .join('\n');
 
-            const dataCheckString = Object.keys(userDataWithoutHash)
+            const dataCheckString = Object.keys(userData2)
                 .sort()
                 .map(key => (`${key}=${userData[key]}`))
                 .join('\n');
