@@ -27,7 +27,7 @@ exports.handler = async (req, context) => {
                 console.log("Token not set")
     
                 return {
-                    statusCode: 403,
+                    statusCode: 302,
                     headers: {
                         'Location': `/403.html`,
                         'Set-Cookie': 'token=; Max-Age=0; Path=/; HttpOnly', // Expire any existing cookie
@@ -67,7 +67,7 @@ exports.handler = async (req, context) => {
         if (linkInfo.expirationTime && Date.now() > linkInfo.expirationTime) {
             console.log("Link expiration time")
             return {
-                statusCode: 403,
+                statusCode: 302,
                 headers: {
                     'Location': `/403.html`,
                 },
@@ -135,7 +135,7 @@ exports.handler = async (req, context) => {
                 console.log("An authenticated telegram ID is required to access this page")
 
                 return {
-                    statusCode: 403,
+                    statusCode: 302,
                     headers: {
                         'Location': `/403.html`,
                     },
@@ -199,7 +199,7 @@ exports.handler = async (req, context) => {
             // Return error 403
             console.log('You are not authorised to access this page');
             return {
-                    statusCode: 403,
+                    statusCode: 302,
                     headers: {
                         'Location': `/403.html`,
                     },
@@ -261,7 +261,7 @@ exports.handler = async (req, context) => {
             } catch (jsonParseError) {
                 console.error('Error parsing JSON:', jsonParseError);
                 return {
-                    statusCode: 500, // Internal Server Error
+                    statusCode: 302, // Internal Server Error
                     headers: {},
                     body: JSON.stringify({
                         error: 'Error parsing JSON response',
@@ -284,7 +284,7 @@ exports.handler = async (req, context) => {
 
         // Return the error response with redirect to the custom error page
         return {
-            statusCode: error.statusCode,
+            statusCode: 302,
             headers: {
                 'Location': `/500.html`,
             },
