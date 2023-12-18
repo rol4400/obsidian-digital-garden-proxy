@@ -97,8 +97,11 @@ exports.handler = async (req, context) => {
             // Extract 'userData' from cookies
             const userData = (sessionCookies.split(';').find(cookie => cookie.trim().startsWith('userData=')).split(/=(.*)/s)[1]).split('&');
 
+            // Remove the hash
+            const userDataWithoutHash = userData.filter(entry => !entry.startsWith('hash='));
+
             // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
-            const dataCheckString = userData
+            const dataCheckString = userDataWithoutHash
                 .sort()
                 .join('\n');
                 // .map(key => (`${key}=${userData[key]}`))
