@@ -90,29 +90,47 @@ exports.handler = async (req, context) => {
 
             // Extract key for telegram ID
             const botToken = process.env.TELE_BOT_TOKEN; // Replace with your actual Telegram bot token
-            const secretKey =  crypto.createHash('sha256')
-                .update(botToken)
-                .digest();
-    
+
+            const secretKey = crypto.createHash('sha256').update(botToken).digest();
+
             // Extract 'userData' from cookies
             const userData = (sessionCookies.split(';').find(cookie => cookie.trim().startsWith('userData=')).split(/=(.*)/s)[1]).split('&');
 
             // Remove the hash
-            const userDataWithoutHash = userData.filter(entry => !entry.startsWith('hash=')).filter(entry => !entry.startsWith('photo_url='));
+            const userDataWithoutHash = userData.filter(entry => !entry.startsWith('hash='));
 
-            // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
+            // Sort and format the data-check-string
             const dataCheckString = userDataWithoutHash
                 .sort()
+                .map(entry => entry.replace('=', '='))
                 .join('\n');
-                // .map(key => (`${key}=${userData[key]}`))
+
+            // Calculate HMAC-SHA-256
+            const hmac = crypto.createHmac('sha256', secretKey).update(Buffer.from(dataCheckString, 'utf-8')).digest('hex');
+
+            // const secretKey =  crypto.createHash('sha256')
+            //     .update(botToken)
+            //     .digest();
+    
+            // // Extract 'userData' from cookies
+            // const userData = (sessionCookies.split(';').find(cookie => cookie.trim().startsWith('userData=')).split(/=(.*)/s)[1]).split('&');
+
+            // // Remove the hash
+            // const userDataWithoutHash = userData.filter(entry => !entry.startsWith('hash='));
+
+            // // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
+            // const dataCheckString = userDataWithoutHash
+            //     .sort()
+            //     .map(key => (`${key}=${userData[key]}`))
+            //     .join('\n');
 
             console.log(userData);
             console.log(dataCheckString);
     
             // run a cryptographic hash function over the data to be authenticated and the secret
-            const hmac =  crypto.createHmac('sha256', secretKey)
-                .update(dataCheckString)
-                .digest('hex');
+            // const hmac =  crypto.createHmac('sha256', secretKey)
+            //     .update(dataCheckString)
+            //     .digest('hex');
     
             // Invalid login hash
             if (hmac !== hash) {
