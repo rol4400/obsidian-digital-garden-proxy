@@ -16,13 +16,13 @@ exports.handler = async (req, context) => {
 
         // Extract the query string parameters and cookie tokens
         var { token, hash } = req.queryStringParameters;
-        const tokenCookie = req.headers.cookie;
+        const sessionCookies = req.headers.cookie;
 
         // If we don't have a token in the query string, try get one from the existing cookies
         if (!token) {
 
             // There are no tokens in the query string or the cookies
-            if (!tokenCookie || !tokenCookie.includes('token=')) {
+            if (!sessionCookies || !sessionCookies.includes('token=')) {
 
                 console.log("Token not set")
     
@@ -37,13 +37,13 @@ exports.handler = async (req, context) => {
             }
             
             // There is a token in the cookies but not the query string
-            token = tokenCookie.split(';').find(cookie => cookie.trim().startsWith('token=')).split('=')[1];
+            token = sessionCookies.split(';').find(cookie => cookie.trim().startsWith('token=')).split('=')[1];
         } else {
 
             // There's a token in the query string. If it's not in the cookies yet (or is an old cookie) we should set it
 
-            var tokenOld = tokenCookie.split(';').find(cookie => cookie.trim().startsWith('token=')).split('=')[1];
-            if (!tokenCookie || !tokenCookie.includes('token=') || tokenOld != token) {
+            var tokenOld = sessionCookies.split(';').find(cookie => cookie.trim().startsWith('token=')).split('=')[1];
+            if (!sessionCookies || !sessionCookies.includes('token=') || tokenOld != token) {
                 const cookieHeader = `token=${token}; Max-Age=36000; Path=/; HttpOnly`;
     
                 console.log("Skipping to auth to set the right cookies")
@@ -78,7 +78,7 @@ exports.handler = async (req, context) => {
         if (linkInfo.telegramIds) {
 
             // The auth cookie hasn't been set yet
-            if (!tokenCookie.includes("userData=")) {
+            if (!sessionCookies.includes("userData=")) {
                 return {
                     statusCode: 302,
                     headers: {
@@ -95,7 +95,7 @@ exports.handler = async (req, context) => {
                 .digest();
     
             // Extract 'userData' from cookies
-            const dataCheckString = tokenCookie.split(';').find(cookie => cookie.trim().startsWith('userData=')).split('=')[1];
+            const dataCheckString = sessionCookies.split(';').find(cookie => cookie.trim().startsWith('userData='));
 
             // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
             // const dataCheckString = Object.keys(userData)
