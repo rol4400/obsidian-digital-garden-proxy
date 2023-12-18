@@ -159,12 +159,15 @@ exports.handler = async (req, context) => {
                     body: 'Failed Telegram authentication',
                 };
             }
+
+            const userId = (userData.filter(entry => entry.startsWith('id='))).toString().split("=")[1];
+            
     
             console.log(linkInfo.telegramIds);
-            console.log(userData["id"]);
+            console.log(userId);
     
             // Check if the user is registered
-            if (!linkInfo.telegramIds.includes(userData["id"])) {
+            if (!linkInfo.telegramIds.includes(userId)) {
 
                 console.log("An authenticated telegram ID is required to access this page")
 
