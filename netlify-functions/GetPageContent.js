@@ -125,12 +125,13 @@ exports.handler = async (req, context) => {
             //     .map(key => (`${key}=${userData[key]}`))
             //     .join('\n');
 
-            const dataCheckString = Object.keys(userData2)
+            const dataCheckString = await Object.keys(userData2)
                 .sort()
                 .map(key => (`${key}=${userData[key]}`))
                 .join('\n');
 
             console.log(userData);
+            console.log(userData2);
             console.log(dataCheckString);
     
             // run a cryptographic hash function over the data to be authenticated and the secret
