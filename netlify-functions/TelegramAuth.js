@@ -10,7 +10,7 @@ exports.handler = async (req, context) => {
             .join('&');
     
         // Set the entire query string as a cookie
-        const cookieValue = encodeURIComponent(req.rawQueryString);
+        const cookieValue = encodeURIComponent(req.queryString);
         const setCookieHeader = `userData=${cookieValue}; Path=/;`;
     
         // Construct the redirect URL without the 'referer' parameter
