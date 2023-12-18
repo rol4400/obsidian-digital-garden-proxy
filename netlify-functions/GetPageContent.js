@@ -120,15 +120,14 @@ exports.handler = async (req, context) => {
             // const userDataWithoutHash = userData.filter(entry => !entry.startsWith('hash='));
 
             // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
-            const dataCheckString = userDataWithoutHash
+            const dataCheckString = decodeURIComponent(userDataWithoutHash
                 .sort()
-                .filter(value => decodeURIComponent(value))
                 // .map(key => (`${key}=${userData[key]}`))
-                .join('\n');
+                .join('\n'));
 
             const dataCheckString2 = await Object.keys(userData2)
                 .sort()
-                .map(key => (`${key}=${userData[key]}`))
+                .map(key => (`${key}=${userData2[key]}`))
                 .join('\n');
 
             console.log("Data1: " + userData);
