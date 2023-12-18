@@ -95,8 +95,7 @@ exports.handler = async (req, context) => {
                 .digest();
     
             // Extract 'userData' from cookies
-            const userDataCookie = tokenCookie.split(';').find(cookie => cookie.trim().startsWith('userData=')).split('=')[1];
-            const userData = JSON.parse(decodeURIComponent(userDataCookie)); // Assuming the data is JSON encoded
+            const userData = tokenCookie.split(';').find(cookie => cookie.trim().startsWith('userData=')).split('=')[1];
 
             // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
             const dataCheckString = Object.keys(userData)
