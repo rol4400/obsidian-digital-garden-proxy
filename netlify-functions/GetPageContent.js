@@ -78,7 +78,7 @@ exports.handler = async (req, context) => {
         if (linkInfo.telegramIds) {
 
             // The auth cookie hasn't been set yet
-            if (!cookie.includes("userData")) {
+            if (!tokenCookie.includes("userData=")) {
                 return {
                     statusCode: 302,
                     headers: {
@@ -95,7 +95,7 @@ exports.handler = async (req, context) => {
                 .digest();
     
             // Extract 'userData' from cookies
-            const userDataCookie = cookies.split(';').find(cookie => cookie.trim().startsWith('userData=')).split('=')[1];
+            const userDataCookie = tokenCookie.split(';').find(cookie => cookie.trim().startsWith('userData=')).split('=')[1];
             const userData = JSON.parse(decodeURIComponent(userDataCookie)); // Assuming the data is JSON encoded
 
             // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
