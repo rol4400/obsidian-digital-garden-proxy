@@ -1,7 +1,7 @@
 
-exports.handler = async (event) => {
+exports.handler = async (req, context) => {
     // Extract query parameters from the request
-    const { referer, ...queryParams } = event.queryStringParameters;
+    const { referer, ...queryParams } = req.queryStringParameters;
 
     // Create a string representation of the remaining query parameters
     const queryString = Object.entries(queryParams)
@@ -9,7 +9,7 @@ exports.handler = async (event) => {
         .join('&');
 
     // Set the entire query string as a cookie
-    const cookieValue = encodeURIComponent(event.rawQueryString);
+    const cookieValue = encodeURIComponent(req.rawQueryString);
     const setCookieHeader = `Set-Cookie: userDatay=${cookieValue}; Path=/;`;
 
     // Construct the redirect URL without the 'referer' parameter

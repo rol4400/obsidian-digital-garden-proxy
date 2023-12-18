@@ -11,10 +11,10 @@ let HEADERS = {
   'Access-Control-Allow-Origin': '*',
 }
 
-exports.handler = async (event, context) => {
+exports.handler = async (req, context) => {
   try {
 
-    if (event.httpMethod !== 'POST') {
+    if (req.httpMethod !== 'POST') {
       // To enable CORS
       return {
         statusCode: 200, // <-- Important!
@@ -23,7 +23,7 @@ exports.handler = async (event, context) => {
       };
    }
 
-    const { address, duration, telegramIds } = JSON.parse(event.body);
+    const { address, duration, telegramIds } = JSON.parse(req.body);
 
     // Validate input
     if (!address || !duration || isNaN(parseInt(duration))) {
