@@ -11,10 +11,10 @@ exports.handler = async (req, context) => {
     
         // Set the entire query string as a cookie
         const cookieValue = encodeURIComponent(req.rawQueryString);
-        const setCookieHeader = `Set-Cookie: userDatay=${cookieValue}; Path=/;`;
+        const setCookieHeader = `userData=${cookieValue}; Path=/;`;
     
         // Construct the redirect URL without the 'referer' parameter
-        const redirectUrl = `/${referer}?${queryString}`;
+        const redirectUrl = `${referer}?${queryString}`;
     
         // Return a response with the redirect and cookie headers
         return {
