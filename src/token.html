@@ -1,0 +1,13 @@
+<html>
+    <body>
+        <script>
+            // Function to get the query parameter by name
+            function getQueryParam(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(name);
+            }
+
+            window.location.href = getQueryParam('referer');
+        </script>
+    </body>
+</html>

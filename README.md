@@ -1,1 +1,4 @@
 # obsidian-digital-garden-proxy
+This functions as a proxy for an obsidian "digital garden" hosted on a separate address. This adds a level of security allowing unique links with tokens to be given with expiry dates and optional telegram authenticaion. It will inject a warning message over the page with the expiry date and uses telegram oauth together with Deta.space object storage and netlify serverless functions to provide a secure authentication system.
+
+When setting up the server for the obsidian "digital garden" itself be sure to whitelist only the IP address of this proxy server to prevent it from being directly accessed if one is to know the original address. That said, this proxy is designed to hide the original address entirely and should rewrite and redirect all internal links and scripts on the page through itself
