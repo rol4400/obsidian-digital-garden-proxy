@@ -74,6 +74,17 @@ exports.handler = async (req, context) => {
 
         if (linkInfo.telegramIds) {
 
+            // The auth cookie hasn't been set yet
+            if (!cookie.includes("userData")) {
+                return {
+                    statusCode: 302,
+                    headers: {
+                        'Location': `/auth.html?referer=` + req.path,
+                    },
+                    body: 'Failed Telegram authentication',
+                };
+            }
+
             // Extract key for telegram ID
             const botToken = process.env.TELE_BOT_TOKEN; // Replace with your actual Telegram bot token
             const secretKey =  crypto.createHash('sha256')
