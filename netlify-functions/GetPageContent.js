@@ -172,7 +172,7 @@ exports.handler = async (req, context) => {
             currentAddressPath === new URL(linkInfo.address).pathname + "/" ||
             currentAddressPath === "/graph.json" ||
             currentAddressPath === "/favicon.ico" ||
-            currentAddressPath.startsWith(`${new URL(linkInfo.address).pathname}/`) ||
+            currentAddressPath.startsWith(`${new URL(linkInfo.address).pathname}`) ||
             currentAddressPath.startsWith('/script/') ||
             currentAddressPath.startsWith('/img/') ||
             currentAddressPath.startsWith('/styles/')
