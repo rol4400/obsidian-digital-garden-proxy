@@ -1,8 +1,10 @@
 // netlify-functions/CreateLink.js
-const { Deta } = require('deta');
+const { createClient } = require('@supabase/supabase-js');
 
-const deta = Deta(process.env.DETA_PROJECT_KEY);
-const linksTable = deta.Base('Obsidian_Links');
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 let HEADERS = {
   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Origin',
@@ -34,13 +36,38 @@ exports.handler = async (req, context) => {
       };
     }
 
-    // Save link information to Deta.Base
-    const link = await linksTable.put({ address, expirationTime: calculateExpirationTime(duration), telegramIds });
+    // Generate a unique token
+    const token = generateUniqueToken();
+    const expirationTime = calculateExpirationTime(duration);
+
+    // Save link information to Supabase
+    const { data, error } = await supabase
+      .from('obsidian_links')
+      .insert([{ 
+        id: token,
+        address,
+        expiration_time: expirationTime,
+        telegram_ids: telegramIds || [],
+        created_at: new Date()
+      }]);
+
+    if (error) {
+      console.error('Error inserting data:', error);
+      return {
+        statusCode: 500,
+        HEADERS,
+        body: JSON.stringify({ error: 'Database Error' }),
+      };
+    }
 
     return {
       statusCode: 200,
       HEADERS,
-      body: JSON.stringify({ link: "https://ryan-notes.netlify.app/?token=" + link.key, token: link.key, expirationTime: link.expires }),
+      body: JSON.stringify({ 
+        link: "https://ryan-notes.netlify.app/?token=" + token, 
+        token: token, 
+        expirationTime: expirationTime 
+      }),
     };
   } catch (error) {
     console.error('Error:', error);
@@ -54,4 +81,14 @@ exports.handler = async (req, context) => {
 
 function calculateExpirationTime(duration) {
   return Date.now() + parseInt(duration) * 1000;
+}
+
+function generateUniqueToken() {
+  // Generate a random string of characters
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let token = '';
+  for (let i = 0; i < 12; i++) {
+    token += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return token;
 }

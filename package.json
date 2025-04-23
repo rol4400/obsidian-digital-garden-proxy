@@ -3,7 +3,7 @@
     "axios": "^1.6.2",
     "cheerio": "^1.0.0-rc.12",
     "crypto": "^1.0.1",
-    "deta": "^2.0.0",
-    "moment": "^2.29.4"
+    "moment": "^2.29.4",
+    "@supabase/supabase-js": "^2.39.0"
   }
 }

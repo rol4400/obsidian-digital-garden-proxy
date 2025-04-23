@@ -1,15 +1,15 @@
 // getPageContent.js
-const {
-    Deta
-} = require('deta');
+const { createClient } = require('@supabase/supabase-js');
 
 const axios = require('axios');
 const cheerio = require('cheerio');
 const moment = require('moment');
 const crypto = require('crypto');
 
-const deta = Deta(process.env.DETA_PROJECT_KEY);
-const linksTable = deta.Base('Obsidian_Links');
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.handler = async (req, context) => {
     try {
@@ -64,11 +64,26 @@ exports.handler = async (req, context) => {
             }
         }
 
-        // Retrieve link information from Deta.Base
-        const linkInfo = await linksTable.get(token);
+        // Retrieve link information from Supabase
+        const { data: linkInfo, error } = await supabase
+            .from('obsidian_links')
+            .select('*')
+            .eq('id', token)
+            .single();
+        
+        if (error || !linkInfo) {
+            console.log("Link not found", error);
+            return {
+                statusCode: 302,
+                headers: {
+                    'Location': `/403.html`,
+                },
+                body: '',
+            };
+        }
 
         // Check if the link has expired
-        if (linkInfo.expirationTime && Date.now() > linkInfo.expirationTime) {
+        if (linkInfo.expiration_time && Date.now() > linkInfo.expiration_time) {
             console.log("Link expiration time")
             return {
                 statusCode: 302,
@@ -79,7 +94,7 @@ exports.handler = async (req, context) => {
             };
         }
 
-        if (linkInfo.telegramIds) {
+        if (linkInfo.telegram_ids) {
 
             // The auth cookie hasn't been set yet
             if (!sessionCookies.includes("userData=")) {
@@ -134,9 +149,9 @@ exports.handler = async (req, context) => {
             const userId = (userData.filter(entry => entry.startsWith('id='))).toString().split("=")[1];
            
             // Check if the user is registered to use this token
-            if (!linkInfo.telegramIds.includes(userId)) {
-
-                console.log("An authenticated telegram ID is required to access this page")
+            const telegramIds = linkInfo.telegram_ids || [];
+            if (!telegramIds.includes(userId)) {
+                console.log("An authenticated telegram ID is required to access this page");
 
                 return {
                     statusCode: 302,
@@ -220,7 +235,7 @@ exports.handler = async (req, context) => {
             
             //Inject the time remaining alert
             if (contentType.includes("html")) {
-                htmlContent = injectWarningAlert(htmlContent, linkInfo.expirationTime);
+                htmlContent = injectWarningAlert(htmlContent, linkInfo.expiration_time);
             }
 
             return {
